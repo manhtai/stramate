@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd parties
+    'huey.contrib.djhuey',
     'tailwind',
     'social_django',
     'heroicons',
@@ -33,6 +34,7 @@ INSTALLED_APPS = [
     'theme',
     'apps.page',
     'apps.account',
+    'apps.activity',
 ]
 
 
@@ -41,7 +43,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-SOCIAL_AUTH_JSONFIELD_ENABLED = True
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.strava.StravaOAuth',
     'django.contrib.auth.backends.ModelBackend',
@@ -67,6 +68,10 @@ SOCIAL_AUTH_PIPELINE = (
 SOCIAL_AUTH_STRAVA_KEY = os.getenv("STRAVA_CLIENT_ID")
 SOCIAL_AUTH_STRAVA_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 
+HUEY = {
+    'huey_class': 'huey.SqliteHuey',
+    'immediate': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

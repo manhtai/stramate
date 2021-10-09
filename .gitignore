@@ -1,3 +1,4 @@
+huey.db*
 *.sqlite3
 *.pyc
 __*__
