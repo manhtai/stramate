@@ -1,6 +1,6 @@
 from django.urls import path
 
-from account.views import ProfileView
+from apps.account.views import ProfileView
 
 app_name = 'account'
 

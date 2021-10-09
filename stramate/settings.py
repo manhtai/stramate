@@ -28,8 +28,8 @@ INSTALLED_APPS = [
     'tailwind',
 
     # Ours
-    'account',
     'theme',
+    'apps.account',
 ]
 
 
