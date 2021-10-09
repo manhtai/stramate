@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 
-{% block body %}
-<section class="absolute inset-0 flex items-center justify-center">
+{% block main %}
 	{% if user.is_authenticated %}
 	Hello {{ user.username }}
 	{% else %}
 	Hello there, you may want to
 	<a href="{% url "social:begin" "strava" %}">Login with Strava</a> first.
 	{% endif %}
-</section>
 {% endblock %}

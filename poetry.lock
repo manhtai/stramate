@@ -195,6 +195,21 @@ cookiecutter = ">=1.7.2,<2.0.0"
 django = ">=2.2"
 
 [[package]]
+name = "heroicons"
+version = "1.3.0"
+description = "Use heroicons in your Django and Jinja templates."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+django = {version = ">=2.2", optional = true, markers = "extra == \"django\""}
+
+[package.extras]
+django = ["django (>=2.2)"]
+jinja = ["jinja2 (>=2.8)"]
+
+[[package]]
 name = "honcho"
 version = "1.0.1"
 description = "Honcho: a Python clone of Foreman. For managing Procfile-based applications."
@@ -616,7 +631,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "513f00e2b59ae2b3488a7b34b51292c75701a0b511b3d43a653d80f3964c4d96"
+content-hash = "b18841a0265a2609f8cd6c92ed09699f9bc84ed71b1bf5f8a3fd9adb8f85b684"
 
 [metadata.files]
 appnope = [
@@ -751,6 +766,10 @@ django = [
 django-tailwind = [
     {file = "django-tailwind-2.2.1.tar.gz", hash = "sha256:ab7136df95ff330fa9e5609c929e11595b2c2b798243de07ccf01d5fd5b13743"},
     {file = "django_tailwind-2.2.1-py3-none-any.whl", hash = "sha256:97b423ed8c6c25c74e466f708815dc2ced44ac17d62e14b002f11bbefe37ce78"},
+]
+heroicons = [
+    {file = "heroicons-1.3.0-py3-none-any.whl", hash = "sha256:cd7a37b44882bd69e17bd295052a641c80f4c7f7291b29b9c8a1befdb5ec899f"},
+    {file = "heroicons-1.3.0.tar.gz", hash = "sha256:b74b9b0ca8b7dcb83fa1884c5cf549d6dd8e77b09e68b85ab83b327a17a971b0"},
 ]
 honcho = [
     {file = "honcho-1.0.1-py2.py3-none-any.whl", hash = "sha256:af5806bf13e3b20acdcb9ff8c0beb91eee6fe07393c3448dfad89667e6ac7576"},

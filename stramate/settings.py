@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # 3rd parties
     'tailwind',
     'social_django',
+    'heroicons',
 
     # Ours
     'theme',
@@ -41,10 +42,15 @@ INTERNAL_IPS = [
 ]
 
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     'social_core.backends.strava.StravaOAuth',
     'django.contrib.auth.backends.ModelBackend',
-)
+]
+SOCIAL_AUTH_STRAVA_SCOPE = ['activity:read']
+
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
