@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "stramate"
+version = "0.1.0"
+description = "Your Strava mate"
+authors = ["manhtai <vo@manhtai.com>"]
+license = "AGPL-3.0"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^3.2.8"
+dj-database-url = "^0.5.0"
+whitenoise = "^5.3.0"
+django-tailwind = "^2.2.1"
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.28.0"
+ipdb = "^0.13.9"
+honcho = "^1.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
