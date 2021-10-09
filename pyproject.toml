@@ -11,6 +11,7 @@ Django = "^3.2.8"
 dj-database-url = "^0.5.0"
 whitenoise = "^5.3.0"
 django-tailwind = "^2.2.1"
+social-auth-app-django = "^5.0.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.28.0"
