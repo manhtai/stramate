@@ -28,6 +28,10 @@ def import_activities(athlete_id):
     client = Client()
     auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
 
+    # FIXME: Open for all?
+    if not auth_user or not auth_user.user.is_staff:
+        print("User not exists or not a staff")
+
     client.access_token = auth_user.extra_data['access_token']
     if auth_user.expiration_timedelta() < PROCESS_TIME:
         res = client.refresh_access_token(
