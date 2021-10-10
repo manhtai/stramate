@@ -2,10 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-FIELD_NAMES = [
-    "id", "name", "type", "description",
-    "distance", "moving_time", "total_elevation_gain", "average_speed",
-]
+FIELD_DEFAULTS = {
+    "id": 0,
+    "name": "",
+    "type": "",
+    "description": "",
+    "distance": 0,
+    "moving_time": 0,
+    "total_elevation_gain": 0,
+    "average_speed": 0,
+}
 
 
 class Activity(models.Model):
@@ -37,7 +43,7 @@ class Activity(models.Model):
         streams_dict = {k: v.to_dict() for k, v in streams.items()}
 
         defaults = {
-            **{k: detail_dict[k] or '' for k in FIELD_NAMES},
+            **{k: detail_dict.get(k) or v for k, v in FIELD_DEFAULTS.items()},
             "start_date": detail.start_date,
             "athlete_id": detail.athlete.id,
             "user_id": user_id,
@@ -52,4 +58,7 @@ class Activity(models.Model):
         return act
 
     def __str__(self):
-        return f"Activity {self.id}: {self.name}"
+        return f"{self.type} #{self.id}: {self.name}"
+
+    class Meta:
+        verbose_name_plural = "activities"

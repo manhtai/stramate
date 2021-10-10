@@ -191,6 +191,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "django-grappelli"
+version = "2.15.3"
+description = "A jazzy skin for the Django Admin-Interface."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "django-tailwind"
 version = "2.2.1"
 description = "Tailwind CSS Framework for Django projects"
@@ -719,7 +727,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "827d82d8b5915c44e23f6c57e82f8eeeb72d203c55702b92a5cb13e400c630f3"
+content-hash = "66201d367908e225b5195ceada833ba34fb127f1242610f96f6524a265e2414b"
 
 [metadata.files]
 appnope = [
@@ -854,6 +862,10 @@ django = [
 django-dotenv = [
     {file = "django-dotenv-1.4.2.tar.gz", hash = "sha256:3812bb0f4876cf31f902aad140f0645e120e51ee30eb7c40c22050f58a0e4adb"},
     {file = "django_dotenv-1.4.2-py2.py3-none-any.whl", hash = "sha256:a9b1b40a70bd321acd231926acedb9bd2c5e873e33a1873b34a7276d196a765e"},
+]
+django-grappelli = [
+    {file = "django-grappelli-2.15.3.tar.gz", hash = "sha256:e21dc664faef6990006c05a6939ee1e2839e13834a338b1f644ea6edb19f68de"},
+    {file = "django_grappelli-2.15.3-py2.py3-none-any.whl", hash = "sha256:edfb8539d000d5908836d909134021c6b3ab3bd2975e7524385b9b3736548598"},
 ]
 django-tailwind = [
     {file = "django-tailwind-2.2.1.tar.gz", hash = "sha256:ab7136df95ff330fa9e5609c929e11595b2c2b798243de07ccf01d5fd5b13743"},

@@ -1,5 +1,5 @@
 from huey import crontab
-from huey.contrib.djhuey import periodic_task, task
+from huey.contrib.djhuey import db_periodic_task, db_task, lock_task
 from social_django.models import UserSocialAuth
 from stravalib.client import Client
 from django.conf import settings
@@ -18,7 +18,7 @@ STREAM_TYPES = ['time', 'latlng', 'distance', 'altitude', 'velocity_smooth',
 
 def update_start_location(activity, line):
     coords = polyline.decode(line)
-    g = geocoder.mapbox(coords[0], method='reverse')
+    g = geocoder.mapbox(coords[0], method='reverse', key=settings.MAPBOX_ACCESS_TOKEN)
     start_location = f"{g.json['raw']['place']}, {g.json['raw']['region']}"
     activity.start_location = start_location
     activity.save()
@@ -55,13 +55,15 @@ def import_activities(athlete_id):
             traceback.print_exc()
 
 
-@task
+@db_task()
 def initial_import(athlete_id):
-    import_activities(athlete_id)
+    with lock_task(f"import-{athlete_id}"):
+        import_activities(athlete_id)
 
 
-@periodic_task(crontab(minute='*/5'))
+# TODO: Use webhook for this
+@db_periodic_task(crontab(minute='*/5'))
 def check_for_new_activities():
-    # TODO: Use webhook for this
     for ua in UserSocialAuth.objects.filter(provider='strava'):
-        import_activities(ua.uid)
+        with lock_task(f"import-{ua.uid}"):
+            import_activities(ua.uid)

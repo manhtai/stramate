@@ -1,3 +1,7 @@
 from django.contrib import admin
+from apps.activity.models import Activity
 
-# Register your models here.
+
+@admin.register(Activity)
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'start_date', 'user']
