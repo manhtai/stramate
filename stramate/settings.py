@@ -17,6 +17,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -25,13 +26,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd parties
+    'huey.contrib.djhuey',
     'tailwind',
     'social_django',
+    'heroicons',
 
     # Ours
     'theme',
     'apps.page',
     'apps.account',
+    'apps.activity',
 ]
 
 
@@ -40,11 +44,15 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-SOCIAL_AUTH_JSONFIELD_ENABLED = True
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     'social_core.backends.strava.StravaOAuth',
     'django.contrib.auth.backends.ModelBackend',
-)
+]
+SOCIAL_AUTH_STRAVA_SCOPE = ['activity:read']
+
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -56,11 +64,17 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
+    'apps.account.pipelines.initialize_activities_import',
 )
 
 SOCIAL_AUTH_STRAVA_KEY = os.getenv("STRAVA_CLIENT_ID")
 SOCIAL_AUTH_STRAVA_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
+MAPBOX_ACCESS_TOKEN = os.getenv("MAPBOX_ACCESS_TOKEN")
 
+HUEY = {
+    'huey_class': 'huey.SqliteHuey',
+    'immediate': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -140,3 +154,5 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+GRAPPELLI_ADMIN_TITLE = 'StraMate'

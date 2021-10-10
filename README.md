@@ -1,4 +1,4 @@
-# Stramate
+# StraMate
 
 > A self-hosted data analyzer for your Strava activities
 

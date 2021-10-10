@@ -1,3 +1,110 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] {
+  display: none;
+}
+
+@layer components {
+  .form-control {
+    @apply relative px-3 py-2 my-0.5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-none appearance-none rounded-md focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm;
+  }
+
+  .form-checkbox {
+    @apply text-gray-600 border-gray-300 rounded shadow-sm focus:border-gray-300 focus:ring focus:ring-gray-200 focus:ring-opacity-50;
+  }
+
+  .form-block {
+    @apply block w-full;
+  }
+
+  .form-inline {
+    @apply inline;
+  }
+
+  .btn {
+    @apply flex inline-flex items-center justify-center px-3 py-1 text-white border border-transparent cursor-pointer leading-5 rounded-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all;
+  }
+
+  .btn-icon {
+    @apply space-x-1;
+  }
+
+
+  .btn-primary {
+    @apply bg-gray-900 focus:ring-gray-800;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 focus:ring-red-500;
+  }
+
+  .btn-warning {
+    @apply bg-yellow-600 focus:ring-yellow-500;
+  }
+
+  .btn-success {
+    @apply bg-green-600 focus:ring-green-500;
+  }
+
+  .btn-outline {
+    @apply text-gray-500 bg-transparent border-gray-500 focus:ring-gray-500;
+  }
+
+  .btn-disabled {
+    @apply bg-gray-200 cursor-not-allowed;
+  }
+
+  .btn-lg {
+    @apply px-3 py-2;
+  }
+
+  .btn-sm {
+    @apply px-2 py-1;
+  }
+
+  .text-link {
+    @apply flex items-center justify-center cursor-pointer hover:opacity-80 transition-all;
+  }
+
+  .text-link__inline {
+    @apply inline border-b border-gray-500;
+  }
+
+  .alert {
+    @apply flex items-center justify-between p-4 text-white border-0 rounded;
+  }
+
+  .alert-info {
+    @apply bg-blue-400;
+  }
+
+  .alert-danger {
+    @apply bg-red-400;
+  }
+
+  .invalid-feedback {
+    @apply text-red-500;
+  }
+
+  .header__wrapper {
+    @apply flex items-center justify-between my-8;
+  }
+
+  .header__title {
+    @apply text-2xl font-semibold leading-10;
+  }
+
+  .pagination__wrapper {
+    @apply flex items-center justify-between my-8 opacity-70;
+  }
+
+  .pagination__button {
+    @apply flex items-center justify-center space-x-1;
+  }
+
+  .pagination__nav {
+    @apply relative flex items-center justify-center w-8 h-8 p-0 mx-1 text-xs leading-tight border rounded-md;
+  }
+}

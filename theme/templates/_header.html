@@ -1,0 +1,54 @@
+{% load heroicons %}
+
+<header class="w-full text-sm text-white bg-gray-900">
+<nave class="container flex flex-wrap items-center justify-between p-2 mx-auto" x-data="{ open: false }">
+	<div class="relative flex justify-between w-full md:w-auto md:static md:block md:justify-start" x-cloak>
+	<nav class="flex items-center mr-8 md:hidden">
+		<a href="/" class="text-link">
+			{% heroicon_outline "home" class="w-4 h-4 mr-1" %}
+			<p class="font-medium"/>StraMate</p>
+		</a>
+	</nav>
+	<button
+		class="block text-xl leading-none bg-transparent border border-transparent border-solid rounded outline-none cursor-pointer md:hidden focus:outline-none"
+		type="button"
+		@click="open = !open"
+		@click.outside="open = false"
+	>
+		<span x-show="!open">
+		{% heroicon_outline "menu" class="w-6 h-6" %}
+		</span>
+		<span x-show="open">
+		{% heroicon_outline "x" class="w-6 h-6" %}
+		</span>
+	</button>
+	</div>
+
+	<div
+	class="flex flex-col items-start justify-start flex-grow md:items-center md:flex-row md:justify-between md:flex md:bg-transparent md:my-0 md:space-y-0 md:border-none"
+	:class="{ 'block my-2 space-y-3 border-t': open, 'hidden': !open }"
+	x-cloak
+	>
+	<nav class="items-center hidden mr-8 md:flex">
+		<a href="/" class="text-link">
+			{% heroicon_outline "home" class="w-4 h-4 mr-1" %}
+			<p class="font-medium"/>StraMate</p>
+		</a>
+	</nav>
+	<nav class="flex flex-col items-start justify-end opacity-70 md:flex-row md:space-x-4 md:items-center md:space-y-0 space-y-3 " x-cloak>
+		{% if user.is_authenticated %}
+		<a href="/account/logout" class="text-link" title="Log out">
+			{% heroicon_outline "logout" class="w-4 h-4 mr-1" %}
+			Log out
+		</a>
+		{% else %}
+		<a href="{% url "social:begin" "strava" %}" class="text-link" title="Log out">
+			{% heroicon_outline "login" class="w-4 h-4 mr-1" %}
+			Sign in
+		</a>
+		{% endif %}
+	</nav>
+	</div>
+</nav>
+</header>
+
