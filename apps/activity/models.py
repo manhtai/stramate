@@ -11,6 +11,7 @@ FIELD_DEFAULTS = {
     "moving_time": 0,
     "total_elevation_gain": 0,
     "average_speed": 0,
+    "timezone": "UTC",
 }
 
 
@@ -27,6 +28,7 @@ class Activity(models.Model):
     average_speed = models.FloatField()  # m/s
 
     start_date = models.DateTimeField()  # Timezone aware
+    timezone = models.TextField()
     start_location = models.TextField()  # place, region
 
     # Full data

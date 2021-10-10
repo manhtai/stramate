@@ -1,164 +1,211 @@
+{% load tz %}
+<section class="space-y-8">
+  <section class="space-y-2">
+    <h2 class="font-medium text-lg">{{ last_year_count }} activities in the last year</h2>
+    <section class="p-2 border rounded">
+      <canvas id="myChart"></canvas>
+    </section>
+  </section>
+
+
+  <section class="space-y-2">
+    <h2 class="font-medium text-lg">Recent activities</h2>
+    <ul class="space-y-4">
+      {% for activity in activities %}
+        <li class="rounded border bg-gray-50 p-4 space-y-4">
+          <p class="text-xs">
+            {% timezone activity.timezone %}
+              {{ activity.start_date|localtime }} &middot; {{ activity.start_location }}
+            {% endtimezone %}
+          </p>
+          <h3 class="font-bold text-xl">
+            {{ activity.name }}
+          </h3>
+          <section class="flex items-center justify-start">
+            <section class="border-r pr-6">
+              <h4 class="text-xs">Type</h4>
+              <p class="text-lg">{{ activity.type }}</p>
+            </section>
+            <section class="border-r px-6">
+              <h4 class="text-xs">Distance</h4>
+              <p class="text-lg">{% widthratio activity.distance 1000.0 1.0 %} km</p>
+            </section>
+            <section class="border-r px-6">
+              <h4 class="text-xs">Elev. gain</h4>
+              <p class="text-lg">{{ activity.total_elevation_gain }} m</p>
+            </section>
+            <section class="px-6">
+              <h4 class="text-xs">Time</h4>
+              <p class="text-lg">{{ activity.moving_time }} s</p>
+            </section>
+          </section>
+          <img src="https://d3o5xota0a1fcr.cloudfront.net/v6/maps/A5JA2JMTURWUKXEERLA2RH4SYQMVSJ7B4VVBWCWIWL3EOHTFIO3ZQOIXD6SE2KL7565U22MCBOZEN5SCOOHHNUQDMICFHKG7" class="rounded" />
+        <li>
+      {% endfor %}
+    </ul>
+  </section>
+</section>
+
 <script src="//cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.1.0/dist/chartjs-chart-matrix.min.js"></script>
 
-
-<section>
-	<h2 class="font-medium text-lg">{{ total }} activities in the last year</h2>
-	<canvas id="myChart" width="400" height="400"></canvas>
-</section>
-
-
-<section>
-	<h2 class="font-medium text-lg">Recent activities</h2>
-</section>
-
 <script>
-const scales = {
-  y: {
-    type: 'time',
-    offset: true,
-    time: {
-      unit: 'day',
-      round: 'day',
-      isoWeekday: 1,
-      parser: 'i',
-      displayFormats: {
-        day: 'iiiiii'
-      }
-    },
-    reverse: true,
-    position: 'right',
-    ticks: {
-      maxRotation: 0,
-      autoSkip: true,
-      padding: 1,
-      font: {
-        size: 9
-      }
-    },
-    grid: {
-      display: false,
-      drawBorder: false,
-      tickLength: 0
-    }
-  },
-  x: {
-    type: 'time',
-    position: 'bottom',
-    offset: true,
-    time: {
-      unit: 'week',
-      round: 'week',
-      isoWeekday: 1,
-      displayFormats: {
-        week: 'MMM dd'
-      }
-    },
-    ticks: {
-      maxRotation: 0,
-      autoSkip: true,
-      font: {
-        size: 9
-      }
-    },
-    grid: {
-      display: false,
-      drawBorder: false,
-      tickLength: 0,
-    }
-  }
-};
-
-const options = {
-  aspectRatio: 5,
-  plugins: {
-    legend: false,
-    tooltip: {
-      displayColors: false,
-      callbacks: {
-        title() {
-          return '';
-        },
-        label(context) {
-          const v = context.dataset.data[context.dataIndex];
-          return ['d: ' + v.d, 'v: ' + v.v.toFixed(2)];
+  const scales = {
+    y: {
+      type: 'time',
+      offset: true,
+      time: {
+        unit: 'day',
+        round: 'day',
+        isoWeekday: 1,
+        parser: 'i',
+        displayFormats: {
+          day: 'iii'
         }
+      },
+      reverse: true,
+      position: 'right',
+      ticks: {
+        source: 'data',
+        maxRotation: 0,
+        autoSkip: true,
+        padding: 10,
+        font: {
+            size: 9,
+        },
+      },
+      grid: {
+        display: false,
+        drawBorder: false,
+        tickLength: 0
+      },
+    },
+    x: {
+      type: 'time',
+      position: 'bottom',
+      offset: true,
+      display: false,
+      time: {
+        unit: 'week',
+        round: 'week',
+        isoWeekday: 1,
+        displayFormats: {
+          week: 'MMM dd'
+        }
+      },
+      grid: {
+        display: false,
+        drawBorder: false,
+        tickLength: 0,
       }
-    },
-  },
-  scales: scales,
-  layout: {
-    padding: {
-      top: 10
     }
+  };
+
+  const options = {
+    aspectRatio: 5,
+    plugins: {
+      legend: false,
+      tooltip: {
+        displayColors: false,
+        callbacks: {
+          title() {
+            return '';
+          },
+          label(context) {
+            const v = context.dataset.data[context.dataIndex];
+            return [v.d, 'Activities: ' + v.v.toFixed(0)];
+          }
+        }
+      },
+    },
+    scales: scales,
+    layout: {
+      padding: {
+        top: 10,
+        bottom: 10,
+      }
+    }
+  };
+
+
+  const endOfToday = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1)
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
   }
-};
 
-
-function startOfToday() {
-  const d = new Date();
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
-}
-
-function isoDayOfWeek(dt) {
-  let wd = dt.getDay(); // 0..6, from sunday
-  wd = (wd + 6) % 7 + 1; // 1..7 from monday
-  return '' + wd; // string so it gets parsed
-}
-
-function generateData() {
-  const data = [];
-  const end = startOfToday();
-  let dt = new Date(new Date().setDate(end.getDate() - 365));
-  while (dt <= end) {
-    const iso = dt.toISOString().substr(0, 10);
-    data.push({
-      x: iso,
-      y: isoDayOfWeek(dt),
-      d: iso,
-      v: Math.random() * 50
-    });
-    dt = new Date(dt.setDate(dt.getDate() + 1));
+  const isoDayOfWeek = (dt) =>{
+    let wd = dt.getDay(); // 0..6, from sunday
+    wd = (wd + 6) % 7 + 1; // 1..7 from monday
+    return '' + wd; // string so it gets parsed
   }
-  return data;
-}
 
-const data = {
-  datasets: [{
-    label: 'My Matrix',
-    data: generateData(),
-    backgroundColor(c) {
+  const generateData = () => {
+    const data = [];
+    const end = endOfToday();
+    let dt = new Date(new Date().setDate(end.getDate() - 365));
+    while (dt <= end) {
+      const iso = dt.toISOString().substr(0, 10);
+      data.push({
+        x: iso,
+        y: isoDayOfWeek(dt),
+        d: iso,
+        v: Math.random() > 0.5 ? Math.random() * 50 : 0,
+      });
+      dt = new Date(dt.setDate(dt.getDate() + 1));
+    }
+    return data;
+  }
+
+  const getBgColor = (c) => {
       const value = c.dataset.data[c.dataIndex].v;
       const alpha = (10 + value) / 60;
-      return value ? '#000' : '#eee';
-    },
-    borderColor(c) {
+      return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
+  }
+
+    const getBorderColor = (c) => {
       const value = c.dataset.data[c.dataIndex].v;
       const alpha = (10 + value) / 60;
-      return value ? '#000' : '#ccc';
-    },
-    borderWidth: 2,
-    hoverBackgroundColor: 'yellow',
-    hoverBorderColor: 'yellowgreen',
-    width(c) {
-      const a = c.chart.chartArea || {};
-      return (a.right - a.left) / 53 - 1;
-    },
-    height(c) {
-      const a = c.chart.chartArea || {};
-      return (a.bottom - a.top) / 7 - 1;
+      return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
     }
-  }]
-};
+
+  const data = {
+    datasets: [{
+      label: 'Activities',
+      data: generateData(),
+      backgroundColor(c) {
+          return getBgColor(c);
+      },
+      borderColor(c) {
+          return getBorderColor(c);
+      },
+      borderWidth: 1,
+      hoverBackgroundColor(c) {
+          return getBgColor(c);
+      },
+      hoverBorderColor(c) {
+          return getBgColor(c);
+      },
+      width(c) {
+        const a = c.chart.chartArea || {};
+        return (a.right - a.left) / 52 - 2;
+      },
+      height(c) {
+        const a = c.chart.chartArea || {};
+        return (a.bottom - a.top) / 8 - 2;
+      },
+      borderRadius: 3,
+    }]
+  };
 
 
-const config = {
-  type: 'matrix',
-  data: data,
-  options: options
-};
+  const config = {
+    type: 'matrix',
+    data: data,
+    options: options
+  };
 
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, config);
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, config);
 </script>

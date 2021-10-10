@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block main %}
-	{% if user.is_authenticated %}
-		{% include "page/home.html" %}
-	{% else %}
-		{% include "page/landing.html" %}
-	{% endif %}
+    {% if user.is_authenticated %}
+        {% include "page/home.html" %}
+    {% else %}
+        {% include "page/landing.html" %}
+    {% endif %}
 {% endblock %}
