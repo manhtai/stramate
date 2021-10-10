@@ -2,9 +2,8 @@
 
 {% block main %}
 	{% if user.is_authenticated %}
-	Hello {{ user.username }}
+		{% include "page/home.html" %}
 	{% else %}
-	Hello there, you may want to
-	<a href="{% url "social:begin" "strava" %}">Login with Strava</a> first.
+		{% include "page/landing.html" %}
 	{% endif %}
 {% endblock %}

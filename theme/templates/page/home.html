@@ -1,0 +1,164 @@
+<script src="//cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.1.0/dist/chartjs-chart-matrix.min.js"></script>
+
+
+<section>
+	<h2 class="font-medium text-lg">{{ total }} activities in the last year</h2>
+	<canvas id="myChart" width="400" height="400"></canvas>
+</section>
+
+
+<section>
+	<h2 class="font-medium text-lg">Recent activities</h2>
+</section>
+
+<script>
+const scales = {
+  y: {
+    type: 'time',
+    offset: true,
+    time: {
+      unit: 'day',
+      round: 'day',
+      isoWeekday: 1,
+      parser: 'i',
+      displayFormats: {
+        day: 'iiiiii'
+      }
+    },
+    reverse: true,
+    position: 'right',
+    ticks: {
+      maxRotation: 0,
+      autoSkip: true,
+      padding: 1,
+      font: {
+        size: 9
+      }
+    },
+    grid: {
+      display: false,
+      drawBorder: false,
+      tickLength: 0
+    }
+  },
+  x: {
+    type: 'time',
+    position: 'bottom',
+    offset: true,
+    time: {
+      unit: 'week',
+      round: 'week',
+      isoWeekday: 1,
+      displayFormats: {
+        week: 'MMM dd'
+      }
+    },
+    ticks: {
+      maxRotation: 0,
+      autoSkip: true,
+      font: {
+        size: 9
+      }
+    },
+    grid: {
+      display: false,
+      drawBorder: false,
+      tickLength: 0,
+    }
+  }
+};
+
+const options = {
+  aspectRatio: 5,
+  plugins: {
+    legend: false,
+    tooltip: {
+      displayColors: false,
+      callbacks: {
+        title() {
+          return '';
+        },
+        label(context) {
+          const v = context.dataset.data[context.dataIndex];
+          return ['d: ' + v.d, 'v: ' + v.v.toFixed(2)];
+        }
+      }
+    },
+  },
+  scales: scales,
+  layout: {
+    padding: {
+      top: 10
+    }
+  }
+};
+
+
+function startOfToday() {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+}
+
+function isoDayOfWeek(dt) {
+  let wd = dt.getDay(); // 0..6, from sunday
+  wd = (wd + 6) % 7 + 1; // 1..7 from monday
+  return '' + wd; // string so it gets parsed
+}
+
+function generateData() {
+  const data = [];
+  const end = startOfToday();
+  let dt = new Date(new Date().setDate(end.getDate() - 365));
+  while (dt <= end) {
+    const iso = dt.toISOString().substr(0, 10);
+    data.push({
+      x: iso,
+      y: isoDayOfWeek(dt),
+      d: iso,
+      v: Math.random() * 50
+    });
+    dt = new Date(dt.setDate(dt.getDate() + 1));
+  }
+  return data;
+}
+
+const data = {
+  datasets: [{
+    label: 'My Matrix',
+    data: generateData(),
+    backgroundColor(c) {
+      const value = c.dataset.data[c.dataIndex].v;
+      const alpha = (10 + value) / 60;
+      return value ? '#000' : '#eee';
+    },
+    borderColor(c) {
+      const value = c.dataset.data[c.dataIndex].v;
+      const alpha = (10 + value) / 60;
+      return value ? '#000' : '#ccc';
+    },
+    borderWidth: 2,
+    hoverBackgroundColor: 'yellow',
+    hoverBorderColor: 'yellowgreen',
+    width(c) {
+      const a = c.chart.chartArea || {};
+      return (a.right - a.left) / 53 - 1;
+    },
+    height(c) {
+      const a = c.chart.chartArea || {};
+      return (a.bottom - a.top) / 7 - 1;
+    }
+  }]
+};
+
+
+const config = {
+  type: 'matrix',
+  data: data,
+  options: options
+};
+
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, config);
+</script>
