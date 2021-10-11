@@ -15,7 +15,6 @@ social-auth-app-django = "^5.0.0"
 heroicons = {extras = ["django"], version = "^1.3.0"}
 huey = "^2.4.1"
 stravalib = "^0.10.4"
-geocoder = "^1.38.1"
 polyline = "^1.4.0"
 django-dotenv = "^1.4.2"
 django-grappelli = "^2.15.3"

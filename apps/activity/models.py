@@ -1,7 +1,6 @@
 from os import path
 from urllib.parse import quote_plus
 
-import geocoder
 import polyline
 import requests
 from django.conf import settings
@@ -71,23 +70,28 @@ class Activity(models.Model):
         file_path = path.join('map', f'activity-{self.id}.png')
 
         if not default_storage.exists(file_path):
-            self.download_map(file_path)
+            self._download_map(file_path)
 
         return file_path
 
     def get_start_location(self):
         if not self.start_location:
             coords = polyline.decode(self.detail["map"]["polyline"])
-            g = geocoder.mapbox(coords[0], method='reverse', key=settings.MAPBOX_ACCESS_TOKEN)
-
-            start_location = f"{g.json['raw']['place']}, {g.json['raw']['region']}"
-
-            self.start_location = start_location
+            lat, lon = coords[0]
+            self.start_location = self._get_place_name(lat, lon)
             self.save()
 
         return self.start_location
 
-    def download_map(self, file_path):
+    def _get_place_name(self, lat, lon):
+        at = settings.MAPBOX_ACCESS_TOKEN
+        url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json?types=place,region&access_token={at}"
+        res = requests.get(url)
+        geo = res.json()
+
+        return geo['features'] and geo['features'][0] and geo['features'][0]['place_name'] or "Unknown"
+
+    def _download_map(self, file_path):
         at = settings.MAPBOX_ACCESS_TOKEN
         pl = quote_plus(self.detail["map"]["polyline"])
         url = f"https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-3+ff0000-1({pl})/auto/1000x400?access_token={at}"
