@@ -1,7 +1,7 @@
 {% load tz %}
 <section class="space-y-8">
   <section class="space-y-2">
-    <h2 class="font-medium text-lg">{{ last_year_count }} activities in the last year</h2>
+    <h2 class="text-lg font-medium">{{ last_year_count }} activities in the last year</h2>
     <section class="p-2 border rounded">
       <canvas id="myChart"></canvas>
     </section>
@@ -9,28 +9,28 @@
 
 
   <section class="space-y-2">
-    <h2 class="font-medium text-lg">Recent activities</h2>
+    <h2 class="text-lg font-medium">Recent activities</h2>
     <ul class="space-y-4">
       {% for activity in activities %}
-        <li class="rounded border bg-gray-50 p-4 space-y-4">
+        <li class="p-4 border rounded bg-gray-50 space-y-4">
           <p class="text-xs">
             {% timezone activity.timezone %}
               {{ activity.start_date|localtime }} &middot; {{ activity.start_location }}
             {% endtimezone %}
           </p>
-          <h3 class="font-bold text-xl">
+          <h3 class="text-xl font-bold">
             {{ activity.name }}
           </h3>
           <section class="flex items-center justify-start">
-            <section class="border-r pr-6">
+            <section class="pr-6 border-r">
               <h4 class="text-xs">Type</h4>
               <p class="text-lg">{{ activity.type }}</p>
             </section>
-            <section class="border-r px-6">
+            <section class="px-6 border-r">
               <h4 class="text-xs">Distance</h4>
               <p class="text-lg">{% widthratio activity.distance 1000.0 1.0 %} km</p>
             </section>
-            <section class="border-r px-6">
+            <section class="px-6 border-r">
               <h4 class="text-xs">Elev. gain</h4>
               <p class="text-lg">{{ activity.total_elevation_gain }} m</p>
             </section>
@@ -39,7 +39,7 @@
               <p class="text-lg">{{ activity.moving_time }} s</p>
             </section>
           </section>
-          <img src="https://d3o5xota0a1fcr.cloudfront.net/v6/maps/A5JA2JMTURWUKXEERLA2RH4SYQMVSJ7B4VVBWCWIWL3EOHTFIO3ZQOIXD6SE2KL7565U22MCBOZEN5SCOOHHNUQDMICFHKG7" class="rounded" />
+          <img src="{% url "activity:map" activity.id %}" class="rounded" />
         <li>
       {% endfor %}
     </ul>
