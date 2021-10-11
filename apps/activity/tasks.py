@@ -59,5 +59,4 @@ def initial_import(athlete_id):
 @db_periodic_task(crontab(minute='*/5'))
 def check_for_new_activities():
     for ua in UserSocialAuth.objects.filter(provider='strava'):
-        with lock_task(f"import-{ua.uid}"):
-            import_activities(ua.uid)
+        import_activities(ua.uid)

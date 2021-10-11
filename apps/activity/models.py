@@ -1,3 +1,4 @@
+from datetime import timedelta
 from os import path
 from urllib.parse import quote_plus
 
@@ -82,6 +83,48 @@ class Activity(models.Model):
             self.save()
 
         return self.start_location
+
+    @property
+    def format_distance(self):
+        if self.distance > 1_000:
+            return f"{self.distance/1_000:.2f} km"
+        return f"{self.distance} m"
+
+    @property
+    def format_elev(self):
+        if self.total_elevation_gain > 1_000:
+            return f"{self.total_elevation_gain/1_000:.2f} km"
+        return f"{self.total_elevation_gain:.0f} m"
+
+    @property
+    def format_pace(self):
+        pace = 1_000 / self.average_speed
+        [d, h, m, s] = self._get_units(pace)
+        return f"{m}:{s:02} /km"
+
+    @property
+    def format_speed(self):
+        return f"{self.average_speed:.1f} m/s"
+
+    @property
+    def format_moving_time(self):
+        [d, h, m, s] = self._get_units(self.moving_time)
+        if d > 0:
+            fdiff = f'{d}d {h}h {m}m'
+        elif h > 0:
+            fdiff = f'{h}h {m}m'
+        elif m > 0:
+            fdiff = f'{m}m {s}s'
+        else:
+            fdiff = f'{s}s'
+        return fdiff
+
+    def _get_units(self, diff):
+        d = int(diff / 86400)
+        h = int((diff - (d * 86400)) / 3600)
+        m = int((diff - (d * 86400 + h * 3600)) / 60)
+        s = int((diff - (d * 86400 + h * 3600 + m * 60)))
+        return [d, h, m, s]
 
     def _get_place_name(self, lat, lon):
         at = settings.MAPBOX_ACCESS_TOKEN

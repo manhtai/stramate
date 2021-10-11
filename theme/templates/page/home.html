@@ -1,8 +1,9 @@
 {% load tz %}
+
 <section>
   <section class="space-y-2 hidden md:block mb-8">
     <h2 class="text-lg font-medium">{{ last_year_count }} activities in the last year</h2>
-    <section class="p-4 border rounded">
+    <section class="px-4 border rounded">
       {% include "page/_heatmap.html" %}
     </section>
   </section>
@@ -17,21 +18,40 @@
               {{ activity.start_date|localtime }} &middot; {{ activity.start_location }}
             {% endtimezone %}
           </p>
-          <h3 class="text-xl font-bold">
-            {{ activity.name }}
+          <h3 class="text-xl font-bold flex items-center justify-start space-x-3">
+            {% if activity.type == "Ride" %}
+              {% include "page/ride.svg" %}
+            {% elif activity.type == "Run" %}
+              {% include "page/run.svg" %}
+            {% elif activity.type == "Swim" %}
+              {% include "page/swim.svg" %}
+            {% else %}
+              {% include "page/activity.svg" %}
+            {% endif %}
+            <span>
+              {{ activity.name }}
+            </span>
           </h3>
           <section class="flex items-start justify-start">
-            <section class="pr-6 border-r">
+            <section class="pr-4 border-r">
               <h4 class="text-xs">Distance</h4>
-              <p class="text-lg">{% widthratio activity.distance 1000.0 1.0 %} km</p>
+              <p class="text-base">{{ activity.format_distance }}</p>
             </section>
-            <section class="px-6 border-r">
-              <h4 class="text-xs">Elev. gain</h4>
-              <p class="text-lg">{{ activity.total_elevation_gain }} m</p>
+            <section class="px-4 border-r">
+              {% if activity.type == "Ride" %}
+                <h4 class="text-xs">Elev. gain</h4>
+                <p class="text-base">{{ activity.format_elev }}</p>
+              {% elif activity.type == "Run" %}
+                <h4 class="text-xs">Pace</h4>
+                <p class="text-base">{{ activity.format_pace }}</p>
+              {% else %}
+                <h4 class="text-xs">Speed</h4>
+                <p class="text-base">{{ activity.format_speed }}</p>
+              {% endif %}
             </section>
-            <section class="px-6">
+            <section class="px-4">
               <h4 class="text-xs">Time</h4>
-              <p class="text-lg">{{ activity.moving_time }} s</p>
+              <p class="text-base">{{ activity.format_moving_time }}</p>
             </section>
           </section>
           <img src="{% url "activity:map" activity.id %}" class="rounded" />
