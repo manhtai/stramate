@@ -1,6 +1,14 @@
-from django.db import models
-from django.contrib.auth.models import User
+from os import path
+from urllib.parse import quote_plus
 
+import geocoder
+import polyline
+import requests
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.db import models
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -58,6 +66,42 @@ class Activity(models.Model):
             defaults=defaults,
         )
         return act
+
+    def get_map_file(self):
+        file_path = path.join('map', f'activity-{self.id}.png')
+
+        if not default_storage.exists(file_path):
+            self.download_map(file_path)
+
+        return file_path
+
+    def get_start_location(self):
+        if not self.start_location:
+            coords = polyline.decode(self.detail["map"]["polyline"])
+            g = geocoder.mapbox(coords[0], method='reverse', key=settings.MAPBOX_ACCESS_TOKEN)
+
+            start_location = f"{g.json['raw']['place']}, {g.json['raw']['region']}"
+
+            self.start_location = start_location
+            self.save()
+
+        return self.start_location
+
+    def download_map(self, file_path):
+        at = settings.MAPBOX_ACCESS_TOKEN
+        pl = quote_plus(self.detail["map"]["polyline"])
+        url = f"https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-3+ff0000-1({pl})/auto/1000x400?access_token={at}"
+
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+
+            default_storage.save(file_path, ContentFile(b''))  # Trick to create file
+
+            with default_storage.open(file_path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+
+        return path
 
     def __str__(self):
         return f"{self.type} #{self.id}: {self.name}"
