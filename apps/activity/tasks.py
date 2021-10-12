@@ -56,7 +56,7 @@ def import_activities(athlete_id, reverse=False):
 
 @db_task()
 def initial_import(athlete_id):
-    import_activities(athlete_id, reserve=True)
+    import_activities(athlete_id, reverse=True)
 
 
 # TODO: Use webhook for this

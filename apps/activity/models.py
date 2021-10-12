@@ -59,6 +59,7 @@ class Activity(models.Model):
         defaults = {
             **{k: detail_dict.get(k) or v for k, v in FIELD_DEFAULTS.items()},
             "start_date": detail.start_date,
+            "start_date_local": detail.start_date_local,
             "athlete_id": detail.athlete.id,
             "user_id": user_id,
             "detail": detail_dict,
