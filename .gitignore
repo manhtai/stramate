@@ -3,3 +3,4 @@ huey.db*
 *.pyc
 __*__
 .vim/*
+media/

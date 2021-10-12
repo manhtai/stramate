@@ -1,20 +1,23 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-	<title>StraMate</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <head>
+        <title>StraMate</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="icon" href={% static "s64.png" %} />
+        <link rel="apple-touch-icon" href={% static "s192.png" %} />
 
-		{% tailwind_css %}
-		<script src="//unpkg.com/alpinejs" defer></script>
-	</head>
+        {% tailwind_css %}
+        <script src="//unpkg.com/alpinejs" defer></script>
+    </head>
 
-	<body class="text-sm text-gray-600">
-		{% include "_header.html" %}
-		<main class="max-w-6xl px-2 pb-20 mx-auto py-10">
-			{% block main %}{% endblock %}
-		</main>
-	</body>
+    <body class="text-sm text-gray-600 bg-gray-50">
+        {% include "_header.html" %}
+        <main class="max-w-3xl px-2 pb-20 mx-auto py-6 md:py-10">
+            {% block main %}{% endblock %}
+        </main>
+        {% include "_footer.html" %}
+    </body>
 </html>
