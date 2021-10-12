@@ -72,16 +72,19 @@ class Activity(models.Model):
         return act
 
     def get_map_file(self):
-        file_path = path.join('map', f'activity-{self.id}.png')
+        if self.start_location:
+            file_path = path.join('map', f'activity-{self.id}.png')
 
-        if not default_storage.exists(file_path):
-            self._download_map(file_path)
+            if not default_storage.exists(file_path):
+                self._download_map(file_path)
 
-        return file_path
+            return file_path
+
+        return ""
 
     def get_start_location(self):
-        if not self.start_location:
-            coords = polyline.decode(self.detail["map"]["polyline"])
+        if not self.start_location and self.polyline:
+            coords = polyline.decode(self.polyline)
             lat, lon = coords[0]
             self.start_location = self._get_place_name(lat, lon)
             self.save()
@@ -90,13 +93,18 @@ class Activity(models.Model):
 
     @classmethod
     def get_last_year_stats(cls, user_id):
-        recent_activities = Activity.objects.filter(
-            user_id=user_id
-        ).order_by('-start_date')[:3]
+        activities = Activity.objects.filter(user_id=user_id)
+        recent_limit = 3
 
         last_year = datetime.today() - timedelta(days=365)
-        last_year_activities = Activity.objects \
-            .filter(user_id=user_id, start_date__gte=last_year) \
+        last_month = datetime.today() - timedelta(days=30)
+
+        all_time_total = activities.count()
+        last_month_total = activities.filter(start_date_local__gte=last_month).count()
+
+        recent_activities = activities.order_by('-start_date')[:recent_limit]
+        last_year_activities = activities \
+            .filter(start_date_local__gte=last_year) \
             .annotate(date=TruncDate('start_date_local')) \
             .values('date') \
             .annotate(count=Count('id')) \
@@ -121,10 +129,16 @@ class Activity(models.Model):
         ]
 
         return {
+            "all_time_total": all_time_total,
+            "last_month_total": last_month_total,
             "recent_activities": recent_activities,
             "last_year_total": last_year_total,
             "last_year_count": last_year_count,
         }
+
+    @property
+    def polyline(self):
+        return self.detail.get("map") and self.detail["map"].get("polyline")
 
     @property
     def format_distance(self):

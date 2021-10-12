@@ -16,9 +16,7 @@ class IndexView(TemplateView):
 
         if self.request.user.is_authenticated:
             stats = Activity.get_last_year_stats(self.request.user.id)
-            context["recent_activities"] = stats["recent_activities"]
-            context["last_year_total"] = stats["last_year_total"]
-            context["last_year_count"] = stats["last_year_count"]
+            context.update(stats)
 
         return context
 
@@ -32,9 +30,8 @@ class AthleteView(TemplateView):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
         stats = Activity.get_last_year_stats(user.id)
-        context["recent_activities"] = stats["recent_activities"]
-        context["last_year_total"] = stats["last_year_total"]
-        context["last_year_count"] = stats["last_year_count"]
+
+        context.update(stats)
         context["username"] = user.username
 
         return context

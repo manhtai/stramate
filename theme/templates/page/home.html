@@ -3,6 +3,13 @@
 {% load humanize %}
 
 {% block main %}
-  <h1 class="mb-10 text-3xl font-bold">Hello, {{ user.username }}!<h1>
+  <section class="flex items-center justify-start space-x-2 mb-8">
+    <h1 class="text-3xl font-bold">Hello,
+      <a href="{% url "page:athlete" user.username %}" class="text-link inline">
+        {{ user.username }}!
+      </a>
+    </h1>
+  </section>
+
   {% include "page/_stats.html" %}
 {% endblock %}

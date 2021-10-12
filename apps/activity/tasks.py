@@ -1,5 +1,5 @@
 from huey import crontab
-from huey.contrib.djhuey import db_periodic_task, db_task, lock_task
+from huey.contrib.djhuey import db_periodic_task, db_task
 from social_django.models import UserSocialAuth
 from stravalib.client import Client
 from django.conf import settings
@@ -15,7 +15,7 @@ STREAM_TYPES = ['time', 'latlng', 'distance', 'altitude', 'velocity_smooth',
                 'heartrate', 'cadence', 'watts', 'temp', 'moving', 'grade_smooth']
 
 
-def import_activities(athlete_id):
+def import_activities(athlete_id, reverse=False):
     client = Client()
     auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
 
@@ -34,10 +34,18 @@ def import_activities(athlete_id):
         auth_user.extra_data['expires'] = int(res['expires_at'] - datetime.utcnow().timestamp())
         auth_user.save()
 
+    # Newest activity
     last_activity = Activity.objects.order_by('start_date').last()
     last_import_time = last_activity and last_activity.start_date
+    activities = client.get_activities(after=last_import_time, limit=PULL_LIMIT)
 
-    for summary in client.get_activities(after=last_import_time, limit=PULL_LIMIT):
+    if reverse:
+        # Oldest activity
+        last_activity = Activity.objects.order_by('start_date').first()
+        last_import_time = last_activity and last_activity.start_date or datetime.utcnow()
+        activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
+
+    for summary in activities:
         try:
             detail = client.get_activity(summary.id, include_all_efforts=True)
             streams = client.get_activity_streams(summary.id, types=STREAM_TYPES)
@@ -52,8 +60,7 @@ def import_activities(athlete_id):
 
 @db_task()
 def initial_import(athlete_id):
-    with lock_task(f"import-{athlete_id}"):
-        import_activities(athlete_id)
+    import_activities(athlete_id, reserve=True)
 
 
 # TODO: Use webhook for this

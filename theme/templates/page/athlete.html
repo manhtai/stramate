@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 
+{% load heroicons %}
+{% load humanize %}
+
 {% block main %}
-  <h1 class="mb-10 text-3xl font-bold">{{ username }}<h1>
+  <section class="flex items-center justify-between mb-8">
+    <section class="flex flex items-center justify-start space-x-2">
+      <a href="https://www.strava.com/athletes/{{ username }}" class="text-link inline">
+        {% include "page/strava.svg" %}
+      </a>
+      <h1 class="text-3xl font-bold">
+        {{ username }}
+      </h1>
+    </section>
+  </section>
+
   {% include "page/_stats.html" %}
 {% endblock %}
