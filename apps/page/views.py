@@ -35,6 +35,6 @@ class AthleteView(TemplateView):
         context["recent_activities"] = stats["recent_activities"]
         context["last_year_total"] = stats["last_year_total"]
         context["last_year_count"] = stats["last_year_count"]
-        context["user"] = user
+        context["username"] = user.username
 
         return context
