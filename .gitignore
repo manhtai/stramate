@@ -4,3 +4,4 @@ huey.db*
 __*__
 .vim/*
 media/
+staticfiles/
