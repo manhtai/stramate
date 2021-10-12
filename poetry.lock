@@ -647,17 +647,6 @@ six = "*"
 units = "*"
 
 [[package]]
-name = "supervisor"
-version = "4.2.2"
-description = "A system for controlling process state under UNIX"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.extras]
-testing = ["pytest", "pytest-cov"]
-
-[[package]]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
@@ -739,7 +728,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "3cb25d96622aa84e4a205dae8987710fdb54d0bdd50fb24d3ad28632dfde7eb9"
+content-hash = "9ffb6aba6c924fb10b40b578d8dd353f2a380789982616cb3b263fc1d3ee4881"
 
 [metadata.files]
 appnope = [
@@ -1068,10 +1057,6 @@ sqlparse = [
 ]
 stravalib = [
     {file = "stravalib-0.10.4.tar.gz", hash = "sha256:451817c68a11e0c77db9cb628e3c4df0f4806c5a481536598ab3baa1d1c21215"},
-]
-supervisor = [
-    {file = "supervisor-4.2.2-py2.py3-none-any.whl", hash = "sha256:4adf63c8f18cf42313171ce06a73c9ae2c5e88ef27c2bb0de3b8405368595c04"},
-    {file = "supervisor-4.2.2.tar.gz", hash = "sha256:5b2b8882ec8a3c3733cce6965cc098b6d80b417f21229ab90b18fe551d619f90"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
