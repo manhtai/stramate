@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from os import path
 from urllib.parse import quote_plus
 
@@ -9,6 +9,9 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
+from django.db.models import Count
+from django.db.models.functions import TruncDate
+
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -35,9 +38,10 @@ class Activity(models.Model):
     total_elevation_gain = models.FloatField()  # s
     average_speed = models.FloatField()  # m/s
 
-    start_date = models.DateTimeField()  # Timezone aware
+    start_date = models.DateTimeField()
     timezone = models.TextField()
-    start_location = models.TextField()  # place, region
+    start_date_local = models.DateTimeField()
+    start_location = models.TextField()  # place_name
 
     # Full data
     detail = models.JSONField()
@@ -83,6 +87,44 @@ class Activity(models.Model):
             self.save()
 
         return self.start_location
+
+    @classmethod
+    def get_last_year_stats(cls, user_id):
+        recent_activities = Activity.objects.filter(
+            user_id=user_id
+        ).order_by('-start_date')[:3]
+
+        last_year = datetime.today() - timedelta(days=365)
+        last_year_activities = Activity.objects \
+            .filter(user_id=user_id, start_date__gte=last_year) \
+            .annotate(date=TruncDate('start_date_local')) \
+            .values('date') \
+            .annotate(count=Count('id')) \
+            .values('date', 'count')
+
+        last_year_dict = {
+            d['date']: d['count']
+            for d in last_year_activities
+        }
+
+        last_year_total = sum(d['count'] for d in last_year_activities)
+
+        last_year_count = [
+            {
+                "x": d.strftime("%Y-%m-%d"),
+                "y": str(d.isoweekday()),
+                "d": d.strftime("%b %-d, %Y"),
+                "v": last_year_dict.get(d.date(), 0),
+            }
+            for i in range(1, 366)
+            for d in [last_year + timedelta(days=i)]
+        ]
+
+        return {
+            "recent_activities": recent_activities,
+            "last_year_total": last_year_total,
+            "last_year_count": last_year_count,
+        }
 
     @property
     def format_distance(self):

@@ -6,6 +6,7 @@ from django.conf import settings
 from datetime import timedelta
 from apps.activity.models import Activity
 import traceback
+from datetime import datetime
 
 
 PROCESS_TIME = timedelta(minutes=5)
@@ -30,7 +31,7 @@ def import_activities(athlete_id):
             refresh_token=auth_user.extra_data['refresh_token'],
         )
         auth_user.extra_data['access_token'] = res['access_token']
-        auth_user.extra_data['expires'] = res['expires_at']
+        auth_user.extra_data['expires'] = int(res['expires_at'] - datetime.utcnow().timestamp())
         auth_user.save()
 
     last_activity = Activity.objects.order_by('start_date').last()

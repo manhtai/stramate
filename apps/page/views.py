@@ -1,6 +1,5 @@
 from django.views.generic import TemplateView
 from apps.activity.models import Activity
-from datetime import datetime, timedelta
 
 
 class IndexView(TemplateView):
@@ -10,16 +9,9 @@ class IndexView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         if self.request.user.is_authenticated:
-            user_activities = Activity.objects.filter(
-                user=self.request.user
-            ).order_by('-start_date')[:3]
-
-            last_year = datetime.utcnow() - timedelta(days=365)
-            last_year_count = Activity.objects.filter(
-                user=self.request.user, start_date__gte=last_year
-            ).count()
-
-            context["last_year_count"] = last_year_count
-            context["activities"] = user_activities
+            stats = Activity.get_last_year_stats(self.request.user.id)
+            context["recent_activities"] = stats["recent_activities"]
+            context["last_year_total"] = stats["last_year_total"]
+            context["last_year_count"] = stats["last_year_count"]
 
         return context
