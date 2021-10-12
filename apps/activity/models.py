@@ -54,7 +54,7 @@ class Activity(models.Model):
     @classmethod
     def upsert(cls, user_id, detail, streams):
         detail_dict = detail.to_dict()
-        streams_dict = {k: v.to_dict() for k, v in streams.items()}
+        streams_dict = {k: v.to_dict() for k, v in streams.items()} if streams else {}
 
         defaults = {
             **{k: detail_dict.get(k) or v for k, v in FIELD_DEFAULTS.items()},
