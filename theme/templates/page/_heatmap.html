@@ -1,5 +1,11 @@
-<h2 class="text-lg font-medium">{{ last_year_total }} activities in the last year</h2>
-<section class="px-4 border rounded">
+{% load humanize %}
+
+<section class="flex items-center justify-between">
+  <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
+  <span>Total: {{ all_time_total|intcomma }}</span>
+</section>
+
+<section class="px-4 border rounded hidden md:block">
   <canvas id="myChart"></canvas>
 </section>
 
