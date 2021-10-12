@@ -11,6 +11,7 @@
 
 
 git pull
+poetry install
 
 poetry run python manage.py tailwind build
 poetry run python manage.py collectstatic --no-input
