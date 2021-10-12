@@ -9,7 +9,7 @@ class IndexView(TemplateView):
     def get_template_names(self):
         if self.request.user.is_authenticated:
             return ["page/home.html"]
-        return ["page/landing.html"]
+        return ["page/index.html"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -24,7 +24,7 @@ class IndexView(TemplateView):
 
 
 class AthleteView(TemplateView):
-    template_name = "page/home.html"
+    template_name = "page/athlete.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -35,5 +35,6 @@ class AthleteView(TemplateView):
         context["recent_activities"] = stats["recent_activities"]
         context["last_year_total"] = stats["last_year_total"]
         context["last_year_count"] = stats["last_year_count"]
+        context["user"] = user
 
         return context
