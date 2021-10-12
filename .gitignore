@@ -3,4 +3,6 @@ huey.db*
 *.pyc
 __*__
 .vim/*
+.env
 media/
+staticfiles/

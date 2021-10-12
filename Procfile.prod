@@ -1,0 +1,2 @@
+web: gunicorn -b "0.0.0.0:$PORT" -w 4 stramate.wsgi
+worker: python manage.py run_huey
