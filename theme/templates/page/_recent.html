@@ -1,6 +1,6 @@
 {% load humanize %}
 
-<section class="flex items-center justify-between">
+<section class="flex items-center justify-between space-x-4">
   <h2 class="text-lg font-medium">
     Latest activities
   </h2>
@@ -15,7 +15,7 @@
         {{ activity.start_date_local|date:"P" }}
         &middot; {{ activity.start_location }}
       </p>
-      <h3 class="text-xl font-bold flex items-center justify-stretch space-x-3">
+      <h3 class="flex items-center text-xl font-bold justify-stretch space-x-3">
         <span class="flex-shrink-0">
         {% if activity.type == "Ride" %}
           {% include "page/ride.svg" %}

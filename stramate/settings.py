@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 default_sk = 'django-insecure-y4g^vbm#_-4a25$-yr6(ymqas5x#mq*^di3n@%exya^4brj+j2'
 SECRET_KEY = os.getenv('SECRET_KEY', default_sk)
 
-DEBUG = os.getenv("DEBUG", True)
+DEBUG = os.getenv('ENV') != "production"
 
 ALLOWED_HOSTS = ["*"]
 
