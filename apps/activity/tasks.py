@@ -1,13 +1,14 @@
+import time
+import traceback
+from datetime import datetime, timedelta
+
+from django.conf import settings
 from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, db_task
 from social_django.models import UserSocialAuth
 from stravalib.client import Client
-from django.conf import settings
-from datetime import timedelta
-from apps.activity.models import Activity
-import traceback
-from datetime import datetime
 
+from apps.activity.models import Activity
 
 PROCESS_TIME = timedelta(minutes=5)
 PULL_LIMIT = 200
@@ -45,25 +46,19 @@ def import_activity(client, auth_user, activity_id):
         traceback.print_exc()
 
 
-def import_activities(athlete_id, reverse=False):
+def import_activities(athlete_id):
     auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
     client = get_client(auth_user)
 
-    # Newest activity
     last_activity = Activity.objects.order_by('start_date').last()
     last_import_time = last_activity and last_activity.start_date
     activities = client.get_activities(after=last_import_time, limit=PULL_LIMIT)
-
-    if reverse:
-        # Oldest activity
-        last_activity = Activity.objects.order_by('start_date').first()
-        last_import_time = last_activity and last_activity.start_date or datetime.utcnow()
-        activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
 
     for summary in activities:
         import_activity(summary.id)
 
 
+@db_task()
 def back_fill(athlete_id):
     auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
     client = get_client(auth_user)
@@ -71,8 +66,10 @@ def back_fill(athlete_id):
     last_import_time = datetime.utcnow()
     done = False
 
+    count = 0
     while not done:
         activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
+        count += 1
 
         active = False
         for summary in activities:
@@ -85,13 +82,14 @@ def back_fill(athlete_id):
 
             print(f"Import activty: #{summary.id}")
             import_activity(summary.id)
+            count += 2
 
         done = not active
 
-
-@db_task()
-def initial_import(athlete_id):
-    import_activities(athlete_id, reverse=True)
+        # Avoid rate limit
+        if count > 400:
+            time.sleep(60)
+            count = 0
 
 
 # TODO: Use webhook for this
