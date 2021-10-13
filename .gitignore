@@ -1,6 +1,7 @@
 huey.db*
 *.sqlite3
 *.pyc
+*.log
 __*__
 .vim/*
 .env
