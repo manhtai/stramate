@@ -94,17 +94,10 @@ class Activity(models.Model):
 
     @classmethod
     def get_last_year_stats(cls, user_id):
-        activities = Activity.objects.filter(user_id=user_id)
-        recent_limit = 3
-
         last_year = datetime.today() - timedelta(days=365)
-        last_month = datetime.today() - timedelta(days=30)
 
-        all_time_total = activities.count()
-        last_month_total = activities.filter(start_date_local__date__gte=last_month).count()
-
-        recent_activities = activities.order_by('-start_date_local')[:recent_limit]
-        last_year_activities = activities \
+        last_year_activities = Activity.objects \
+            .filter(user_id=user_id) \
             .filter(start_date_local__gte=last_year) \
             .annotate(date=TruncDate('start_date_local')) \
             .values('date') \
@@ -131,9 +124,6 @@ class Activity(models.Model):
         ]
 
         return {
-            "all_time_total": all_time_total,
-            "last_month_total": last_month_total,
-            "recent_activities": recent_activities,
             "last_year_total": last_year_total,
             "last_year_moving": last_year_moving,
         }

@@ -1,12 +1,13 @@
 {% load humanize %}
 
-<section class="flex items-center justify-between space-x-4">
-  <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
-  <span>Total: {{ all_time_total|intcomma }}</span>
-</section>
+<section class="mb-8 space-y-2">
+  <section class="flex items-center justify-between space-x-4">
+    <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
+  </section>
 
-<section class="px-4 border rounded">
-  <canvas id="myChart"></canvas>
+  <section class="px-4 border rounded">
+    <canvas id="myChart"></canvas>
+  </section>
 </section>
 
 <script src="//cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
