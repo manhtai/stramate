@@ -5,9 +5,9 @@
 {% block main %}
   <section class="flex items-center justify-start space-x-2 my-10">
     <h1 class="text-3xl font-bold">Hello,
-      <a href="{% url "page:athlete" user.username %}" class="text-link inline">
-        {{ user.username }}!
-      </a>
+      <a href="{% url "page:athlete" user.username %}" class="text-link__inline">
+        {{ user.username }}
+      </a>!
     </h1>
   </section>
 
