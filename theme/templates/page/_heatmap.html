@@ -21,21 +21,29 @@
       time: {
         unit: 'day',
         round: 'day',
-        isoWeekday: 1,
-        parser: 'i',
+        isoWeekday: 0,
+        parser: function(w) {
+          const d = new Date();
+          const diff = w - d.getDay();
+          d.setDate(d.getDate() + diff);
+          return d
+        },
         displayFormats: {
           day: 'iii'
         }
       },
       reverse: true,
-      position: 'right',
+      position: 'left',
       ticks: {
         source: 'data',
         maxRotation: 0,
         autoSkip: true,
         padding: 10,
         font: {
-            size: 9,
+          size: 9,
+        },
+        callback: function(value, index, values) {
+          return ['Mon', 'Wed', 'Fri'].indexOf(value) > -1 ? value : '';
         },
       },
       grid: {
@@ -52,9 +60,9 @@
       time: {
         unit: 'week',
         round: 'week',
-        isoWeekday: 1,
+        isoWeekday: 0,
         displayFormats: {
-          week: 'MMM dd'
+          week: 'MMM'
         }
       },
       grid: {
@@ -77,7 +85,7 @@
           },
           label(context) {
             const v = context.dataset.data[context.dataIndex];
-            return [v.d, 'Activities: ' + v.v.toFixed(0)];
+            return [(v.v || "No") + (v.v == 1 ? ' activity' : ' activities') + ' on ' + v.d];
           }
         }
       },
@@ -91,18 +99,6 @@
     }
   };
 
-
-  const endOfToday = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1)
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
-  }
-
-  const isoDayOfWeek = (dt) =>{
-    let wd = dt.getDay(); // 0..6, from sunday
-    wd = (wd + 6) % 7 + 1; // 1..7 from monday
-    return '' + wd; // string so it gets parsed
-  }
 
   const getBgColor = (c) => {
       const value = c.dataset.data[c.dataIndex].v;

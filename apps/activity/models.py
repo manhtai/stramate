@@ -101,9 +101,9 @@ class Activity(models.Model):
         last_month = datetime.today() - timedelta(days=30)
 
         all_time_total = activities.count()
-        last_month_total = activities.filter(start_date_local__gte=last_month).count()
+        last_month_total = activities.filter(start_date_local__date__gte=last_month).count()
 
-        recent_activities = activities.order_by('-start_date')[:recent_limit]
+        recent_activities = activities.order_by('-start_date_local')[:recent_limit]
         last_year_activities = activities \
             .filter(start_date_local__gte=last_year) \
             .annotate(date=TruncDate('start_date_local')) \
@@ -121,7 +121,7 @@ class Activity(models.Model):
         last_year_count = [
             {
                 "x": d.strftime("%Y-%m-%d"),
-                "y": str(d.isoweekday()),
+                "y": (d + timedelta(days=1)).weekday(),
                 "d": d.strftime("%b %-d, %Y"),
                 "v": last_year_dict.get(d.date(), 0),
             }
