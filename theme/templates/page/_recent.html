@@ -1,3 +1,4 @@
+{% load tz %}
 {% load humanize %}
 
 <section class="flex items-center justify-between space-x-4">
@@ -11,8 +12,10 @@
   {% for activity in recent_activities %}
     <li class="p-4 border rounded bg-gray-50 space-y-4">
       <p class="text-xs">
-        {{ activity.start_date_local|naturalday|title }} at
-        {{ activity.start_date_local|date:"P" }}
+        {% timezone activity.timezone %}
+          {{ activity.start_date|naturalday|title }} at
+          {{ activity.start_date|date:"P" }}
+        {% endtimezone %}
         &middot; {{ activity.start_location }}
       </p>
       <h3 class="flex items-center text-xl font-bold justify-stretch space-x-3">
