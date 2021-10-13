@@ -97,7 +97,7 @@
   }
 
   .pagination__wrapper {
-    @apply flex items-center justify-between my-8 opacity-70;
+    @apply flex items-center justify-between my-10 opacity-70;
   }
 
   .pagination__button {

@@ -1,14 +1,54 @@
 {% load humanize %}
+{% load heroicons %}
 
-<section class="flex items-center justify-between space-x-4">
-  <h2 class="text-lg font-medium">
-    Latest activities
-  </h2>
-  <span>Last month: {{ last_month_total|intcomma }}</span>
+<section class="mb-8 space-y-2">
+  <section class="flex items-center justify-between space-x-4">
+    <h2 class="text-lg font-medium">
+      Latest activities
+    </h2>
+  </section>
+
+  <ul class="space-y-4">
+    {% for activity in page_obj %}
+      {% include "page/_activity.html" %}
+    {% endfor %}
+  </ul>
 </section>
 
-<ul class="space-y-4">
-  {% for activity in recent_activities %}
-    {% include "page/_activity.html" %}
-  {% endfor %}
-</ul>
+
+<section class="pagination__wrapper">
+  <p class="text-sm">
+    Total: {{ total }} activities
+  </p>
+
+  <ul class="pagination__button">
+    {% if page_obj.number %}
+      {% if page_obj.has_previous %}
+        {% if page_obj.previous_page_number != 1 %}
+          <a href="?page=1" class="pagination__nav">
+            {% heroicon_outline "chevron-double-left" class="w-6 h-6" %}
+          </a>
+        {% endif %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="pagination__nav">
+          {% heroicon_outline "chevron-left" class="w-6 h-6" %}
+        </a>
+      {% endif %}
+
+      <span class="px-2">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="pagination__nav">
+          {% heroicon_outline "chevron-right" class="w-6 h-6" %}
+        </a>
+
+        {% if page_obj.next_page_number != page_obj.paginator.num_pages %}
+          <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination__nav">
+            {% heroicon_outline "chevron-double-right" class="w-6 h-6" %}
+          </a>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  </ul>
+</section>

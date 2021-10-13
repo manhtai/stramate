@@ -55,7 +55,7 @@ def import_activities(athlete_id):
     activities = client.get_activities(after=last_import_time, limit=PULL_LIMIT)
 
     for summary in activities:
-        import_activity(summary.id)
+        import_activity(client, auth_user, summary.id)
 
 
 @db_task()
@@ -81,7 +81,7 @@ def back_fill(athlete_id):
                 continue
 
             print(f"Import activty: #{summary.id}")
-            import_activity(summary.id)
+            import_activity(client, auth_user, summary.id)
             count += 2
 
         done = not active

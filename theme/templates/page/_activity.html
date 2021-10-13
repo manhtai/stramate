@@ -47,5 +47,7 @@
       <p class="text-base">{{ activity.format_moving_time }}</p>
     </section>
   </section>
-  <img src="{% url "activity:map" activity.id %}" class="rounded" />
+  {% if activity.start_location %}
+    <img src="{% url "activity:map" activity.id %}" class="rounded" />
+  {% endif %}
 <li>
