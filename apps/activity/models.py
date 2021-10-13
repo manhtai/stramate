@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
-from django.db.models import Count
+from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate
 
 
@@ -101,29 +101,30 @@ class Activity(models.Model):
         last_month = datetime.today() - timedelta(days=30)
 
         all_time_total = activities.count()
-        last_month_total = activities.filter(start_date_local__gte=last_month).count()
+        last_month_total = activities.filter(start_date_local__date__gte=last_month).count()
 
-        recent_activities = activities.order_by('-start_date')[:recent_limit]
+        recent_activities = activities.order_by('-start_date_local')[:recent_limit]
         last_year_activities = activities \
             .filter(start_date_local__gte=last_year) \
             .annotate(date=TruncDate('start_date_local')) \
             .values('date') \
-            .annotate(count=Count('id')) \
-            .values('date', 'count')
+            .annotate(moving=Sum('moving_time'), count=Count('id')) \
+            .values('date', 'moving', 'count')
 
         last_year_dict = {
-            d['date']: d['count']
+            d['date']: d['moving']
             for d in last_year_activities
         }
 
         last_year_total = sum(d['count'] for d in last_year_activities)
 
-        last_year_count = [
+        last_year_moving = [
             {
                 "x": d.strftime("%Y-%m-%d"),
-                "y": str(d.isoweekday()),
+                "y": (d + timedelta(days=1)).weekday(),
                 "d": d.strftime("%b %-d, %Y"),
                 "v": last_year_dict.get(d.date(), 0),
+                "l": cls.format_time(last_year_dict.get(d.date(), 0)),
             }
             for i in range(1, 366)
             for d in [last_year + timedelta(days=i)]
@@ -134,7 +135,7 @@ class Activity(models.Model):
             "last_month_total": last_month_total,
             "recent_activities": recent_activities,
             "last_year_total": last_year_total,
-            "last_year_count": last_year_count,
+            "last_year_moving": last_year_moving,
         }
 
     @property
@@ -163,20 +164,29 @@ class Activity(models.Model):
     def format_speed(self):
         return f"{self.average_speed:.1f} m/s"
 
-    @property
-    def format_moving_time(self):
-        [d, h, m, s] = self._get_units(self.moving_time)
+    @staticmethod
+    def format_time(seconds):
+        [d, h, m, s] = Activity._get_units(seconds)
+
         if d > 0:
             fdiff = f'{d}d {h}h {m}m'
         elif h > 0:
             fdiff = f'{h}h {m}m'
         elif m > 0:
             fdiff = f'{m}m {s}s'
-        else:
+        elif s > 0:
             fdiff = f'{s}s'
+        else:
+            fdiff = ''
+
         return fdiff
 
-    def _get_units(self, diff):
+    @property
+    def format_moving_time(self):
+        return self.format_time(self.moving_time)
+
+    @staticmethod
+    def _get_units(diff):
         d = int(diff / 86400)
         h = int((diff - (d * 86400)) / 3600)
         m = int((diff - (d * 86400 + h * 3600)) / 60)

@@ -1,13 +1,14 @@
+import time
+import traceback
+from datetime import datetime, timedelta
+
+from django.conf import settings
 from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, db_task
 from social_django.models import UserSocialAuth
 from stravalib.client import Client
-from django.conf import settings
-from datetime import timedelta
-from apps.activity.models import Activity
-import traceback
-from datetime import datetime
 
+from apps.activity.models import Activity
 
 PROCESS_TIME = timedelta(minutes=5)
 PULL_LIMIT = 200
@@ -15,9 +16,8 @@ STREAM_TYPES = ['time', 'latlng', 'distance', 'altitude', 'velocity_smooth',
                 'heartrate', 'cadence', 'watts', 'temp', 'moving', 'grade_smooth']
 
 
-def import_activities(athlete_id, reverse=False):
+def get_client(auth_user):
     client = Client()
-    auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
 
     client.access_token = auth_user.extra_data['access_token']
     if auth_user.expiration_timedelta() < PROCESS_TIME:
@@ -30,33 +30,66 @@ def import_activities(athlete_id, reverse=False):
         auth_user.extra_data['expires'] = int(res['expires_at'] - datetime.utcnow().timestamp())
         auth_user.save()
 
-    # Newest activity
+    return client
+
+
+def import_activity(client, auth_user, activity_id):
+    try:
+        detail = client.get_activity(activity_id, include_all_efforts=True)
+        streams = client.get_activity_streams(activity_id, types=STREAM_TYPES)
+        activity = Activity.upsert(auth_user.user_id, detail, streams)
+        print("Created Strava activity:", activity)
+
+        activity.get_start_location()
+        activity.get_map_file()
+    except Exception:
+        traceback.print_exc()
+
+
+def import_activities(athlete_id):
+    auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
+    client = get_client(auth_user)
+
     last_activity = Activity.objects.order_by('start_date').last()
     last_import_time = last_activity and last_activity.start_date
     activities = client.get_activities(after=last_import_time, limit=PULL_LIMIT)
 
-    if reverse:
-        # Oldest activity
-        last_activity = Activity.objects.order_by('start_date').first()
-        last_import_time = last_activity and last_activity.start_date or datetime.utcnow()
-        activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
-
     for summary in activities:
-        try:
-            detail = client.get_activity(summary.id, include_all_efforts=True)
-            streams = client.get_activity_streams(summary.id, types=STREAM_TYPES)
-            activity = Activity.upsert(auth_user.user_id, detail, streams)
-            print("Created Strava activity:", activity)
-
-            activity.get_start_location()
-            activity.get_map_file()
-        except Exception:
-            traceback.print_exc()
+        import_activity(summary.id)
 
 
 @db_task()
-def initial_import(athlete_id):
-    import_activities(athlete_id, reverse=True)
+def back_fill(athlete_id):
+    auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
+    client = get_client(auth_user)
+
+    last_import_time = datetime.utcnow()
+    done = False
+
+    count = 0
+    while not done:
+        activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
+        count += 1
+
+        active = False
+        for summary in activities:
+            active = True
+            last_import_time = summary.start_date
+
+            if Activity.objects.filter(id=summary.id).exists():
+                print(f"Skip activity: #{summary.id}")
+                continue
+
+            print(f"Import activty: #{summary.id}")
+            import_activity(summary.id)
+            count += 2
+
+        done = not active
+
+        # Avoid rate limit
+        if count > 400:
+            time.sleep(60)
+            count = 0
 
 
 # TODO: Use webhook for this
