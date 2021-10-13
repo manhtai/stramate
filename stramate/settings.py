@@ -53,7 +53,7 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.strava.StravaOAuth',
     'django.contrib.auth.backends.ModelBackend',
 ]
-SOCIAL_AUTH_STRAVA_SCOPE = ['activity:read']
+SOCIAL_AUTH_STRAVA_SCOPE = ['activity:read_all']
 
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/"

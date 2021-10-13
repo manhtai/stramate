@@ -15,9 +15,8 @@ STREAM_TYPES = ['time', 'latlng', 'distance', 'altitude', 'velocity_smooth',
                 'heartrate', 'cadence', 'watts', 'temp', 'moving', 'grade_smooth']
 
 
-def import_activities(athlete_id, reverse=False):
+def get_client(auth_user):
     client = Client()
-    auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
 
     client.access_token = auth_user.extra_data['access_token']
     if auth_user.expiration_timedelta() < PROCESS_TIME:
@@ -29,6 +28,26 @@ def import_activities(athlete_id, reverse=False):
         auth_user.extra_data['access_token'] = res['access_token']
         auth_user.extra_data['expires'] = int(res['expires_at'] - datetime.utcnow().timestamp())
         auth_user.save()
+
+    return client
+
+
+def import_activity(client, auth_user, activity_id):
+    try:
+        detail = client.get_activity(activity_id, include_all_efforts=True)
+        streams = client.get_activity_streams(activity_id, types=STREAM_TYPES)
+        activity = Activity.upsert(auth_user.user_id, detail, streams)
+        print("Created Strava activity:", activity)
+
+        activity.get_start_location()
+        activity.get_map_file()
+    except Exception:
+        traceback.print_exc()
+
+
+def import_activities(athlete_id, reverse=False):
+    auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
+    client = get_client(auth_user)
 
     # Newest activity
     last_activity = Activity.objects.order_by('start_date').last()
@@ -42,16 +61,30 @@ def import_activities(athlete_id, reverse=False):
         activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
 
     for summary in activities:
-        try:
-            detail = client.get_activity(summary.id, include_all_efforts=True)
-            streams = client.get_activity_streams(summary.id, types=STREAM_TYPES)
-            activity = Activity.upsert(auth_user.user_id, detail, streams)
-            print("Created Strava activity:", activity)
+        import_activity(summary.id)
 
-            activity.get_start_location()
-            activity.get_map_file()
-        except Exception:
-            traceback.print_exc()
+
+def back_fill(athlete_id):
+    auth_user = UserSocialAuth.objects.get_social_auth("strava", athlete_id)
+    client = get_client(auth_user)
+
+    last_import_time = datetime.utcnow()
+    done = False
+
+    while not done:
+        activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
+
+        for summary in activities:
+            if Activity.objects.filter(id=summary.id).exists():
+                print(f"Skip activity: #{summary.id}")
+                continue
+
+            print(f"Import activty: #{summary.id}")
+            last_import_time = summary.start_date
+            # import_activity(summary.id)
+
+        if not activities:
+            done = True
 
 
 @db_task()
