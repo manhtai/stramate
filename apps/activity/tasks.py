@@ -74,17 +74,19 @@ def back_fill(athlete_id):
     while not done:
         activities = client.get_activities(before=last_import_time, limit=PULL_LIMIT)
 
+        active = False
         for summary in activities:
+            active = True
+            last_import_time = summary.start_date
+
             if Activity.objects.filter(id=summary.id).exists():
                 print(f"Skip activity: #{summary.id}")
                 continue
 
             print(f"Import activty: #{summary.id}")
-            last_import_time = summary.start_date
             import_activity(summary.id)
 
-        if not activities:
-            done = True
+        done = not active
 
 
 @db_task()
