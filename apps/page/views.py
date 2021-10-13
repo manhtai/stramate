@@ -6,6 +6,9 @@ from django.core.paginator import Paginator
 from apps.activity.models import Activity
 
 
+PAGE_SIZE = 3
+
+
 class IndexView(TemplateView):
     def get_template_names(self):
         if self.request.user.is_authenticated:
@@ -21,7 +24,7 @@ class IndexView(TemplateView):
             context.update(stats)
 
             user_activities = Activity.objects.filter(user_id=user.id).order_by('-id')
-            paginator = Paginator(user_activities, 3)
+            paginator = Paginator(user_activities, PAGE_SIZE)
             page_number = self.request.GET.get('page')
             page_obj = paginator.get_page(page_number)
 
@@ -46,7 +49,7 @@ class AthleteView(TemplateView):
         context["username"] = user.username
 
         user_activities = Activity.objects.filter(user_id=user.id).order_by('-id')
-        context["page_obj"] = user_activities[:3]
+        context["page_obj"] = user_activities[:PAGE_SIZE]
         context["total"] = user_activities.count()
 
         return context
