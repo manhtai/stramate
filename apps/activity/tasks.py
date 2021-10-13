@@ -81,7 +81,7 @@ def back_fill(athlete_id):
 
             print(f"Import activty: #{summary.id}")
             last_import_time = summary.start_date
-            # import_activity(summary.id)
+            import_activity(summary.id)
 
         if not activities:
             done = True
