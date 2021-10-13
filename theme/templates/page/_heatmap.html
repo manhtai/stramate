@@ -86,7 +86,9 @@
           },
           label(context) {
             const v = context.dataset.data[context.dataIndex];
-            return [(v.v || "No") + (v.v == 1 ? ' activity' : ' activities') + ' on ' + v.d];
+            return [
+              (!v.v ? "No activities" : "Moved for " + v.l) + " on " + v.d,
+            ];
           }
         }
       },
@@ -100,23 +102,22 @@
     }
   };
 
-
   const getBgColor = (c) => {
       const value = c.dataset.data[c.dataIndex].v;
-      const alpha = value / 3;
+      const alpha = value / 7200;
       return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
   }
 
     const getBorderColor = (c) => {
       const value = c.dataset.data[c.dataIndex].v;
-      const alpha = value / 3;
+      const alpha = value / 7200;
       return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
     }
 
   const data = {
     datasets: [{
-      label: 'Activities',
-      data: {{ last_year_count|safe }},
+      label: 'Moving time',
+      data: {{ last_year_moving|safe }},
       backgroundColor(c) {
           return getBgColor(c);
       },
