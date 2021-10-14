@@ -1,0 +1,175 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <title>StraMate</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <link rel="icon" href={% static "img/s64.png" %} />
+      <link rel="apple-touch-icon" href={% static "img/s192.png" %} />
+      <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet">
+
+      {% tailwind_css %}
+  </head>
+  <body>
+    <div id="map" class="fixed inset-0">
+    </div>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js" /></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFuaHRhaSIsImEiOiJja3VrbGF6ZmwwYWt2Mm5tbzZzaG9kMTQyIn0.XzJeIRSTtXhzmrsSBhaC6Q';
+        (async () => {
+            const coords = {{ activity.geojson_coords|safe }};
+            const initialRot = {{ activity.initial_rotation }};
+            const geoJson = {
+              "type": "FeatureCollection",
+              "features":
+              [
+                  {
+                       "type": "Feature",
+                       "properties": {},
+                       "geometry": {
+                            "type": "LineString",
+                            "coordinates": coords,
+                       }
+                  }
+               ]
+            };
+            const map = new mapboxgl.Map({
+                container: 'map',
+                zoom: 13,
+                center: coords[0],
+                pitch: 76,
+                bearing: initialRot,
+                style: 'mapbox://styles/mapbox/satellite-streets-v11',
+                interactive: true,
+                hash: false,
+            });
+
+            await map.once('load')
+
+            // Create the marker and popup that will display the elevation queries
+            const popup = new mapboxgl.Popup({ closeButton: false });
+            const marker = new mapboxgl.Marker({
+                color: 'red',
+                scale: 0.8,
+                draggable: false,
+                pitchAlignment: 'auto',
+                rotationAlignment: 'auto'
+            })
+                .setLngLat(coords[0])
+                .setPopup(popup)
+                .addTo(map)
+                .togglePopup();
+
+            // Add a line feature and layer. This feature will get updated as we progress the animation
+            map.addSource('line', {
+                type: 'geojson',
+                // Line metrics is required to use the 'line-progress' property
+                lineMetrics: true,
+                data: geoJson
+            });
+
+            map.addLayer({
+                type: 'line',
+                source: 'line',
+                id: 'line',
+                paint: {
+                    'line-color': 'rgba(0,0,0,0)',
+                    'line-width': 5
+                },
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                }
+            });
+
+            // Add some fog in the background
+            /*
+            map.setFog({
+                'range': [-0.5, 2],
+                'color': 'white',
+                'horizon-blend': 0.2
+            });
+            */
+
+            // Add a sky layer over the horizon
+            map.addLayer({
+                'id': 'sky',
+                'type': 'sky',
+                'paint': {
+                    'sky-type': 'atmosphere',
+                    'sky-atmosphere-color': 'rgba(85, 151, 210, 0.5)'
+                }
+            });
+
+            // Add terrain source, with slight exaggeration
+            map.addSource('mapbox-dem', {
+                'type': 'raster-dem',
+                'url': 'mapbox://mapbox.terrain-rgb',
+                'tileSize': 512,
+                'maxzoom': 14
+            });
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+            await map.once('idle');
+            // The total animation duration, in milliseconds
+            const animationDuration = coords.length * 50;
+            // Use the https://turfjs.org/ library to calculate line distances and
+            // sample the line at a given percentage with the turf.along function.
+            const path = turf.lineString(coords);
+            // Get the total line distance
+            const pathDistance = turf.lineDistance(path);
+
+            let start;
+            function frame(time) {
+                if (!start) start = time;
+                const animationPhase = (time - start) / animationDuration;
+                if (animationPhase > 1) {
+                    return;
+                }
+
+                // Get the new latitude and longitude by sampling along the path
+                const alongPath = turf.along(path, pathDistance * animationPhase)
+                    .geometry.coordinates;
+                const lngLat = {
+                    lng: alongPath[0],
+                    lat: alongPath[1]
+                };
+
+                // Sample the terrain elevation. We round to an integer value to
+                // prevent showing a lot of digits during the animation
+                const elevation = Math.floor(
+                    // Do not use terrain exaggeration to get actual meter values
+                    map.queryTerrainElevation(lngLat, { exaggerated: false })
+                );
+
+                // Update the popup altitude value and marker location
+                popup.setHTML('Altitude: ' + elevation + 'm<br/>');
+                marker.setLngLat(lngLat);
+
+                // Reduce the visible length of the line by using a line-gradient to cutoff the line
+                // animationPhase is a value between 0 and 1 that reprents the progress of the animation
+                map.setPaintProperty('line', 'line-gradient', [
+                    'step',
+                    ['line-progress'],
+                    'red',
+                    animationPhase,
+                    'rgba(255, 0, 0, 0)'
+                ]);
+
+                // Rotate the camera at a slightly lower speed to give some parallax effect in the background
+                const rotation = initialRot - animationPhase * 40.0;
+                map.setBearing(rotation % 360);
+
+                window.requestAnimationFrame(frame);
+            }
+
+            window.requestAnimationFrame(frame);
+        })();
+    </script>
+  </body>
+</html>

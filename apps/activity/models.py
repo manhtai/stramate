@@ -12,7 +12,7 @@ from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
-from django.utils.timezone import make_aware
+
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -43,6 +43,8 @@ class Activity(models.Model):
     timezone = models.TextField()
     start_date_local = models.DateTimeField()
     start_location = models.TextField()  # place_name
+
+    initial_rotation = models.IntegerField(default=-10)
 
     # Full data
     detail = models.JSONField()
@@ -86,12 +88,24 @@ class Activity(models.Model):
 
     def get_start_location(self):
         if not self.start_location and self.polyline:
-            coords = polyline.decode(self.polyline)
-            lat, lon = coords[0]
+            lat, lon = self.coords[0]
             self.start_location = self._get_place_name(lat, lon)
             self.save()
 
         return self.start_location
+
+    @property
+    def coords(self):
+        if self.polyline:
+            return [[a, b] for (a, b) in polyline.decode(self.polyline)]
+        return []
+
+    @property
+    def geojson_coords(self):
+        if self.polyline:
+            return [[b, a] for (a, b) in polyline.decode(self.polyline)]
+
+        return []
 
     @classmethod
     def get_last_year_stats(cls, user_id):
