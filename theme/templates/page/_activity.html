@@ -1,5 +1,6 @@
 {% load tz %}
 {% load humanize %}
+{% load heroicons %}
 
 <li class="p-4 border rounded bg-gray-50 space-y-4">
   <p class="text-xs">
@@ -48,6 +49,8 @@
     </section>
   </section>
   {% if activity.start_location %}
-    <img src="{% url "activity:map" activity.id %}" class="rounded" />
+    <a href="{% url "activity:route" activity.id %}" target="new" class="block">
+      <img src="{% url "activity:map" activity.id %}" class="rounded" />
+    </a>
   {% endif %}
 <li>

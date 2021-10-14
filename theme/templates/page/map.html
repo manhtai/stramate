@@ -22,8 +22,8 @@
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoibWFuaHRhaSIsImEiOiJja3VrbGF6ZmwwYWt2Mm5tbzZzaG9kMTQyIn0.XzJeIRSTtXhzmrsSBhaC6Q';
         (async () => {
-            const coords = {{ coords|safe }};
-            const initialRot = -10;
+            const coords = {{ activity.geojson_coords|safe }};
+            const initialRot = {{ activity.initial_rotation }};
             const geoJson = {
               "type": "FeatureCollection",
               "features":
@@ -123,6 +123,7 @@
             const path = turf.lineString(coords);
             // Get the total line distance
             const pathDistance = turf.lineDistance(path);
+
             let start;
             function frame(time) {
                 if (!start) start = time;
@@ -155,7 +156,7 @@
                 map.setPaintProperty('line', 'line-gradient', [
                     'step',
                     ['line-progress'],
-                    'orange',
+                    'red',
                     animationPhase,
                     'rgba(255, 0, 0, 0)'
                 ]);

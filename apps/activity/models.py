@@ -12,7 +12,7 @@ from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
-from django.utils.timezone import make_aware
+
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -43,6 +43,8 @@ class Activity(models.Model):
     timezone = models.TextField()
     start_date_local = models.DateTimeField()
     start_location = models.TextField()  # place_name
+
+    initial_rotation = models.IntegerField(default=-10)
 
     # Full data
     detail = models.JSONField()
@@ -95,7 +97,14 @@ class Activity(models.Model):
     @property
     def coords(self):
         if self.polyline:
-            return polyline.decode(self.polyline)
+            return [[a, b] for (a, b) in polyline.decode(self.polyline)]
+        return []
+
+    @property
+    def geojson_coords(self):
+        if self.polyline:
+            return [[b, a] for (a, b) in polyline.decode(self.polyline)]
+
         return []
 
     @classmethod

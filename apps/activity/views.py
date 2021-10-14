@@ -26,7 +26,6 @@ class ThreeDView(TemplateView):
 
         activity_id = kwargs.get('activity_id')
         activity = get_object_or_404(Activity, id=activity_id)
-
-        context["coords"] = [[a, b] for (b, a) in activity.coords]
+        context["activity"] = activity
 
         return context
