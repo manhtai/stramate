@@ -40,8 +40,8 @@
             };
             const map = new mapboxgl.Map({
                 container: 'map',
-                zoom: 13,
-                center: coords[0],
+                zoom: 12,
+                center: coords[(coords.length - coords.length % 2) / 2],
                 pitch: 76,
                 bearing: initialRot,
                 style: 'mapbox://styles/mapbox/satellite-streets-v11',
