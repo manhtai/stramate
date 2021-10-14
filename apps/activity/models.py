@@ -3,15 +3,16 @@ from os import path
 from urllib.parse import quote_plus
 
 import polyline
+import pytz
 import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
-from django.db.models import Sum, Count
+from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
-
+from django.utils.timezone import make_aware
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -94,11 +95,20 @@ class Activity(models.Model):
 
     @classmethod
     def get_last_year_stats(cls, user_id):
-        last_year = datetime.today() - timedelta(days=365)
+        last_year = datetime.today() - timedelta(days=366)
+        user_activities = Activity.objects.filter(
+            user_id=user_id,
+            start_date_local__gte=last_year,
+        )
 
-        last_year_activities = Activity.objects \
-            .filter(user_id=user_id) \
-            .filter(start_date_local__gte=last_year) \
+        tz = user_activities.values("timezone") \
+            .annotate(count=Count('timezone')) \
+            .order_by("-count").first()
+        timezone = tz['timezone'] if tz else "UTC"
+
+        today = datetime.now().astimezone(pytz.timezone(timezone))
+
+        last_year_activities = user_activities \
             .annotate(date=TruncDate('start_date_local')) \
             .values('date') \
             .annotate(moving=Sum('moving_time'), count=Count('id')) \
@@ -119,8 +129,8 @@ class Activity(models.Model):
                 "v": last_year_dict.get(d.date(), 0),
                 "l": cls.format_time(last_year_dict.get(d.date(), 0)),
             }
-            for i in range(1, 366)
-            for d in [last_year + timedelta(days=i)]
+            for i in range(0, 366)
+            for d in [today - timedelta(days=i)]
         ]
 
         return {

@@ -1,15 +1,37 @@
 {% extends "base.html" %}
 
+{% load heroicons %}
 {% load humanize %}
+{% load tz %}
 
 {% block main %}
   <section class="flex items-center justify-start space-x-2 my-10">
-    <h1 class="text-3xl font-bold">Hello,
-      <a href="{% url "page:athlete" user.username %}" class="text-link inline">
-        {{ user.username }}!
-      </a>
+    <h1 class="text-4xl font-bold">
+      Hello, {{ user.username }}!
     </h1>
   </section>
 
-  {% include "page/_stats.html" %}
+  <section class="mb-8 space-y-2">
+    <section class="flex items-center justify-between space-x-4">
+      <h2 class="text-lg font-medium">
+        Your latest activity was on
+        {% if activity %}
+          {% timezone activity.timezone %}
+            {{ activity.start_date|naturalday }}
+          {% endtimezone %}
+        {% else %}
+          the previous life
+        {% endif %}
+      </h2>
+      <a href="{% url "page:athlete" user.username %}" class="text-link opacity-50">
+        View all
+        {% heroicon_outline "chevron-right" class="w-4 h-4" %}
+      </a>
+    </section>
+    <ul class="space-y-4">
+      {% if activity %}
+        {% include "page/_activity.html" %}
+      {% endif %}
+    </ul>
+  </section>
 {% endblock %}

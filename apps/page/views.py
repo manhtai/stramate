@@ -17,19 +17,11 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
 
-        if user.is_authenticated:
-            stats = Activity.get_last_year_stats(user.id)
-            context.update(stats)
-
-            user_activities = Activity.objects.filter(user_id=user.id).order_by('-id')
-            paginator = Paginator(user_activities, PAGE_SIZE)
-            page_number = self.request.GET.get('page')
-            page_obj = paginator.get_page(page_number)
-
-            context["page_obj"] = page_obj
-            context["total"] = user_activities.count()
+        if self.request.user.is_authenticated:
+            context["activity"] = Activity.objects.filter(
+                user_id=self.request.user.id
+            ).last()
 
         return context
 
@@ -44,12 +36,21 @@ class AthleteView(TemplateView):
         user = get_object_or_404(User, username=username)
 
         stats = Activity.get_last_year_stats(user.id)
+        user_activities = Activity.objects.filter(
+            user_id=user.id
+        ).order_by('-id')
 
         context.update(stats)
         context["username"] = user.username
-
-        user_activities = Activity.objects.filter(user_id=user.id).order_by('-id')
-        context["page_obj"] = user_activities[:PAGE_SIZE]
         context["total"] = user_activities.count()
+
+        if self.request.user.is_authenticated and self.request.user == user:
+            paginator = Paginator(user_activities, PAGE_SIZE)
+            page_number = self.request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+
+            context["page_obj"] = page_obj
+        else:
+            context["page_obj"] = user_activities[:PAGE_SIZE]
 
         return context

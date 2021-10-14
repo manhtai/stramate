@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 
 {% block main %}
-<section class="text-center">
-  Hello there, you may want to
-  <a href="{% url "social:begin" "strava" %}" class="text-link inline">login with Strava</a> first,
-  I may put something up here later.
+<section class="flex items-center justify-start space-x-2 my-10">
+  <h1 class="text-4xl font-bold">
+    Hello there!
+  </h1>
 </section>
+
+<p class="text-xl leading-8 mb-8">
+  You may want to find out
+  <a href="https://github.com/plainlab/stramate" target="new" class="text-link__inline">what</a>
+  is this or
+  <a href="{% url "social:begin" "strava" %}" class="text-link__inline">connect</a>
+  with Strava first, I will put something up here later.
+</p>
+
+<img
+    class="rounded text-center mb-10"
+    src="https://images.unsplash.com/photo-1600077106724-946750eeaf3c?fit=crop&w=900&q=80" />
 {% endblock %}
