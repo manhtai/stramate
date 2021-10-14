@@ -7,16 +7,15 @@
   </h1>
 </section>
 
-<section class="space-y-8 flex flex-col items-center justify-center">
-  <p class="text-xl leading-8">
-    You may want to find out
-    <a href="https://github.com/plainlab/stramate" target="new" class="text-link__inline">what</a>
-    is this or
-    <a href="{% url "social:begin" "strava" %}" class="text-link__inline">connect</a>
-    with Strava first, I will put something up here later.
-  </p>
-  <img
-      class="rounded text-center"
-      src="https://images.unsplash.com/photo-1600077106724-946750eeaf3c?fit=crop&w=900&q=80" />
-</section>
+<p class="text-xl leading-8 mb-8">
+  You may want to find out
+  <a href="https://github.com/plainlab/stramate" target="new" class="text-link__inline">what</a>
+  is this or
+  <a href="{% url "social:begin" "strava" %}" class="text-link__inline">connect</a>
+  with Strava first, I will put something up here later.
+</p>
+
+<img
+    class="rounded text-center mb-10"
+    src="https://images.unsplash.com/photo-1600077106724-946750eeaf3c?fit=crop&w=900&q=80" />
 {% endblock %}
