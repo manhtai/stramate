@@ -86,12 +86,17 @@ class Activity(models.Model):
 
     def get_start_location(self):
         if not self.start_location and self.polyline:
-            coords = polyline.decode(self.polyline)
-            lat, lon = coords[0]
+            lat, lon = self.coords[0]
             self.start_location = self._get_place_name(lat, lon)
             self.save()
 
         return self.start_location
+
+    @property
+    def coords(self):
+        if self.polyline:
+            return polyline.decode(self.polyline)
+        return []
 
     @classmethod
     def get_last_year_stats(cls, user_id):
