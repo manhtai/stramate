@@ -10,8 +10,10 @@
     </a>
   </section>
 
-  <section class="px-4 border rounded">
-    <canvas id="myChart"></canvas>
+  <section class="px-4 border rounded overflow-hidden flex items-center justify-end">
+    <section style="width: 718px; height: 143px;">
+      <canvas id="myChart" style="width: 718px; height: 143px;"></canvas>
+    </section>
   </section>
 </section>
 
@@ -81,6 +83,7 @@
   };
 
   const options = {
+    responsive: false,
     aspectRatio: 5,
     plugins: {
       legend: false,
