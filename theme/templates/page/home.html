@@ -1,23 +1,25 @@
 {% extends "base.html" %}
 
 {% load humanize %}
+{% load tz %}
 
 {% block main %}
   <section class="flex items-center justify-start space-x-2 my-10">
     <h1 class="text-3xl font-bold">
-      Hello, {{ user.username }}!
+      Hello,
+      <a href="{% url "page:athlete" user.username %}" class="text-link__inline">{{ user.username }}</a>!
     </h1>
   </section>
 
-  <section class="flex items-center justify-between space-x-4 mb-8">
-    <h2 class="text-xl font-medium">
-      Your latest activity is here,
-      <a href="{% url "page:athlete" user.username %}" class="text-link__inline">view</a>
-      your full training log.
-    </h2>
-  </section>
-
   <section class="mb-8 space-y-2">
+    <section class="flex items-center justify-between space-x-4">
+      <h2 class="text-lg font-medium">
+        Your latest activity was on
+        {% timezone activity.timezone %}
+          {{ activity.start_date|naturalday }}
+        {% endtimezone %}
+      </h2>
+    </section>
     <ul class="space-y-4">
       {% include "page/_activity.html" %}
     </ul>
