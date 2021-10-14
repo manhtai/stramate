@@ -15,9 +15,13 @@
     <section class="flex items-center justify-between space-x-4">
       <h2 class="text-lg font-medium">
         Your latest activity was on
-        {% timezone activity.timezone %}
-          {{ activity.start_date|naturalday }}
-        {% endtimezone %}
+        {% if activity %}
+          {% timezone activity.timezone %}
+            {{ activity.start_date|naturalday }}
+          {% endtimezone %}
+        {% else %}
+          the previous life
+        {% endif %}
       </h2>
       <a href="{% url "page:athlete" user.username %}" class="text-link opacity-50">
         View all
@@ -25,7 +29,9 @@
       </a>
     </section>
     <ul class="space-y-4">
-      {% include "page/_activity.html" %}
+      {% if activity %}
+        {% include "page/_activity.html" %}
+      {% endif %}
     </ul>
   </section>
 {% endblock %}
