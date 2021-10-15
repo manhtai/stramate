@@ -3,14 +3,19 @@
 {% load heroicons %}
 {% load static %}
 
-<li class="p-4 border rounded bg-gray-50 space-y-4">
-  <p class="text-xs">
-    {% timezone activity.timezone %}
-      {{ activity.start_date|naturalday|title }} at
-      {{ activity.start_date|date:"P" }}
-    {% endtimezone %}
-    &middot; {{ activity.start_location }}
-  </p>
+<li class="p-4 border rounded bg-gray-50 space-y-4 relative">
+  <section class="flex items-center justify-between space-x-2">
+    <p class="text-xs">
+      {% timezone activity.timezone %}
+        {{ activity.start_date|naturalday|title }} at
+        {{ activity.start_date|date:"P" }}
+      {% endtimezone %}
+      &middot; {{ activity.start_location }}
+    </p>
+    <a href="{% url "activity:route" activity.id %}" class="text-link opacity-50">
+      {% heroicon_outline "external-link" class="w-4 h-4" %}
+    </a>
+  </section>
   <h3 class="flex items-center text-xl font-bold justify-stretch space-x-3">
     <span class="flex-shrink-0">
     {% if activity.type == "Ride" %}
@@ -23,9 +28,7 @@
       {% include "page/activity.svg" %}
     {% endif %}
     </span>
-    <span>
-      {{ activity.name }}
-    </span>
+    <p>{{ activity.name }}</p>
   </h3>
   <section class="flex items-start justify-start">
     <section class="pr-4 border-r">
@@ -50,8 +53,6 @@
     </section>
   </section>
   {% if activity.start_location %}
-    <a href="{% url "activity:route" activity.id %}" target="new" class="block">
-      <img src="{% get_media_prefix %}{{ activity.map }}" class="rounded" />
-    </a>
+    <img src="{% get_media_prefix %}{{ activity.map }}" class="rounded" />
   {% endif %}
 <li>

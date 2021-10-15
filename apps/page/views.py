@@ -45,8 +45,8 @@ class AthleteView(TemplateView):
         context["total"] = user_activities.count()
 
         if self.request.user.is_authenticated and self.request.user == user:
-            paginator = Paginator(user_activities, PAGE_SIZE)
             page_number = self.request.GET.get('page')
+            paginator = Paginator(user_activities, PAGE_SIZE)
             page_obj = paginator.get_page(page_number)
 
             context["page_obj"] = page_obj
