@@ -13,7 +13,7 @@
 
   <section class="mb-8 space-y-2">
     <section class="flex items-center justify-between space-x-4">
-      <a href="{% url "page:athlete" activity.user.username %}" class="text-link text-lg font-medium">
+      <a href="{% url "page:athlete" activity.user.username %}" class="text-link text-lg font-medium opacity-50">
         {% heroicon_outline "chevron-left" class="w-4 h-4" %}
         Profile
       </a>
@@ -22,8 +22,26 @@
         {% heroicon_outline "external-link" class="w-4 h-4 ml-1" %}
       </a>
     </section>
-    <ul class="space-y-4">
+    <form method="post" class="mt-8 space-y-6 px-4 py-6 rounded border">
+        {{ form.non_field_errors }}
+        <div>
+            {{ form.name.errors }}
+            <label for="{{ form.name.id_for_label }}">Name:</label>
+            {{ form.name }}
+        </div>
+        <div>
+            {{ form.description.errors }}
+            <label for="{{ form.description.id_for_label }}">Description:</label>
+            {{ form.description }}
+        </div>
+        <div>
+            {{ form.initial_rotation.errors }}
+            <label for="{{ form.initial_rotation.id_for_label }}">Initial map rotation:</label>
+            {{ form.initial_rotation }}
+        </div>
 
-    </ul>
+        <input type="submit" value="Update" class="btn btn-lg btn-primary w-full">
+        {% csrf_token %}
+    </form>
   </section>
 {% endblock %}
