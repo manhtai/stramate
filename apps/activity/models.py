@@ -95,6 +95,10 @@ class Activity(models.Model):
         return self.start_location
 
     @property
+    def map(self):
+        return self.get_map_file()
+
+    @property
     def coords(self):
         if self.polyline:
             return [[a, b] for (a, b) in polyline.decode(self.polyline)]
