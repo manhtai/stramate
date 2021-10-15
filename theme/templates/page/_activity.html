@@ -10,11 +10,13 @@
         {{ activity.start_date|naturalday|title }} at
         {{ activity.start_date|date:"P" }}
       {% endtimezone %}
-      &middot; {{ activity.start_location }}
+      &middot; {% firstof activity.start_location "Somewhere" %}
     </p>
-    <a href="{% url "activity:route" activity.id %}" class="text-link opacity-50">
-      {% heroicon_outline "external-link" class="w-4 h-4" %}
-    </a>
+    {% if request.user == activity.user %}
+      <a href="{% url "activity:detail" activity.id %}" class="text-link">
+        {% heroicon_outline "pencil-alt" class="w-4 h-4" %}
+      </a>
+    {% endif %}
   </section>
   <h3 class="flex items-center text-xl font-bold justify-stretch space-x-3">
     <span class="flex-shrink-0">
@@ -53,6 +55,8 @@
     </section>
   </section>
   {% if activity.start_location %}
-    <img src="{% get_media_prefix %}{{ activity.map }}" class="rounded" />
+    <a href="{% url "activity:route" activity.id %}" class="text-link">
+      <img src="{% get_media_prefix %}{{ activity.map }}" class="rounded" />
+    </a>
   {% endif %}
 <li>

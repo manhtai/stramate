@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load heroicons %}
+{% load humanize %}
+{% load tz %}
+
+{% block main %}
+  <section class="flex items-center justify-start space-x-2 my-10">
+    <h1 class="text-4xl font-bold">
+        {{ activity.name }}
+    </h1>
+  </section>
+
+  <section class="mb-8 space-y-2">
+    <section class="flex items-center justify-between space-x-4">
+      <a href="{% url "page:athlete" activity.user.username %}" class="text-link text-lg font-medium">
+        {% heroicon_outline "chevron-left" class="w-4 h-4" %}
+        Profile
+      </a>
+      <a href="{% url "page:athlete" user.username %}" class="text-link opacity-50">
+        Route
+        {% heroicon_outline "external-link" class="w-4 h-4 ml-1" %}
+      </a>
+    </section>
+    <ul class="space-y-4">
+
+    </ul>
+  </section>
+{% endblock %}
