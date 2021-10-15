@@ -5,7 +5,7 @@
 {% load tz %}
 
 {% block main %}
-  <section class="flex items-center justify-start space-x-2 my-10">
+  <section class="flex items-center justify-start my-10 space-x-2">
     <h1 class="text-4xl font-bold">
         {{ activity.name }}
     </h1>
@@ -13,16 +13,16 @@
 
   <section class="mb-8 space-y-2">
     <section class="flex items-center justify-between space-x-4">
-      <a href="{% url "page:athlete" activity.user.username %}" class="text-link text-lg font-medium opacity-50">
+      <a href="{% url "page:athlete" activity.user.username %}" class="text-lg font-medium opacity-50 text-link">
         {% heroicon_outline "chevron-left" class="w-4 h-4" %}
         Profile
       </a>
-      <a href="{% url "page:athlete" user.username %}" class="text-link opacity-50">
+      <a href="{% url "page:athlete" user.username %}" class="opacity-50 text-link">
         Route
         {% heroicon_outline "external-link" class="w-4 h-4 ml-1" %}
       </a>
     </section>
-    <form method="post" class="mt-8 space-y-6 px-4 py-6 rounded border">
+    <form method="post" class="px-4 py-6 mt-8 border rounded space-y-6">
         {{ form.non_field_errors }}
         <div>
             {{ form.name.errors }}
@@ -40,7 +40,7 @@
             {{ form.initial_rotation }}
         </div>
 
-        <input type="submit" value="Update" class="btn btn-lg btn-primary w-full">
+        <input type="submit" value="Update" class="w-full btn btn-lg btn-primary">
         {% csrf_token %}
     </form>
   </section>
