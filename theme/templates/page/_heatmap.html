@@ -6,7 +6,7 @@
     <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
     {% if request.user.username == username %}
       <a href="/" class="text-link opacity-50">
-        Progress
+        Your progress
         {% heroicon_outline "chart-bar" class="w-4 h-4 ml-1" %}
       </a>
     {% endif %}

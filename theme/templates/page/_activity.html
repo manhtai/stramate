@@ -13,7 +13,9 @@
       &middot; {% firstof activity.start_location "Somewhere" %}
     </p>
     {% if request.user == activity.user %}
-      <a href="{% url "activity:detail" activity.id %}" class="opacity-50 text-link">
+      <a href="{% url "activity:detail" activity.id %}"
+         class="opacity-50 text-link"
+         title="Edit this activity">
         {% heroicon_outline "pencil-alt" class="w-4 h-4" %}
       </a>
     {% endif %}

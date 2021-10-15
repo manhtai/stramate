@@ -16,6 +16,10 @@
       <h2 class="text-lg font-medium">
         Your fitness progress
       </h2>
+      <a href="{% url "page:athlete" user.username %}" class="opacity-50 text-link">
+        Your profile
+        {% heroicon_outline "chevron-right" class="w-4 h-4" %}
+      </a>
     </section>
     {% include "activity/progress.html" %}
   </section>
@@ -26,10 +30,6 @@
       <h2 class="text-lg font-medium">
         Your latest activity
       </h2>
-      <a href="{% url "page:athlete" user.username %}" class="opacity-50 text-link">
-        Profile
-        {% heroicon_outline "chevron-right" class="w-4 h-4" %}
-      </a>
     </section>
     <ul>
       {% include "page/_activity.html" %}
