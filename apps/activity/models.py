@@ -12,7 +12,7 @@ from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
-
+from django.urls import reverse_lazy
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -234,6 +234,9 @@ class Activity(models.Model):
                     f.write(chunk)
 
         return path
+
+    def get_absolute_url(self):
+        return reverse_lazy("activity:detail", args=(self.id,))
 
     def __str__(self):
         return f"{self.type} #{self.id}: {self.name}"

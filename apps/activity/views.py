@@ -1,6 +1,10 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
+from django.views.generic.edit import UpdateView
 
+from apps.activity.forms import ActivityForm
 from apps.activity.models import Activity
 
 
@@ -15,3 +19,16 @@ class RouteView(TemplateView):
         context["activity"] = activity
 
         return context
+
+
+class DetailView(LoginRequiredMixin, UpdateView):
+    model = Activity
+    form_class = ActivityForm
+    pk_url_kwarg = "activity_id"
+    template_name = "activity/detail.html"
+
+    def get_object(self, **kwargs):
+        obj = super().get_object(**kwargs)
+        if obj.user != self.request.user:
+            raise Http404()
+        return obj

@@ -4,10 +4,12 @@
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
     <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
-    <a href="https://www.strava.com/athletes/{{ username }}" class="text-link opacity-50" target="new">
-      Strava
-      {% heroicon_outline "external-link" class="w-4 h-4 ml-1" %}
-    </a>
+    {% if request.user.username == username %}
+      <a href="/" class="text-link opacity-50">
+        Progress
+        {% heroicon_outline "chart-bar" class="w-4 h-4 ml-1" %}
+      </a>
+    {% endif %}
   </section>
 
   <section class="px-4 border rounded overflow-hidden flex items-center justify-end">
