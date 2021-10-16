@@ -9,7 +9,7 @@ from apps.account.models import Athlete
 from apps.activity.models import Activity
 
 
-class SingleAnalyzer():
+class PointAnalyzer():
 
     def __init__(self, activity_id: int):
         self.activity = Activity.objects.get(id=activity_id)
@@ -68,20 +68,21 @@ class SingleAnalyzer():
         self.hrss = (self.trimp / (60 * athlete_hrr_lthr * (0.64 * np.exp(self.trimp_factor * athlete_hrr_lthr)))) * 100
 
 
-class ProgressAnalyzer():
+class TrendAnalyzer():
 
-    def __init__(self, user_id):
-        self.user_id = user_id
+    def __init__(self, athlete_id):
+        self.athlete_id = athlete_id
 
     def analyze(self):
         last_year = datetime.today() - timedelta(days=366)
         user_activities = Activity.objects.filter(
-            user_id=self.user_id,
+            athlete_id=self.athlete_id,
             start_date__gte=last_year,
         ).order_by('start_date')
 
         last = user_activities.last()
         self.timezone = pytz.timezone(last.timezone if last else "UTC")
+        self.user = last.user
 
         today = datetime.now().astimezone(self.timezone)
         last_year = today - timedelta(days=366)
@@ -90,9 +91,16 @@ class ProgressAnalyzer():
 
         if len(user_analytics):
             self.df = pd.DataFrame(user_analytics)
+
+            today_local = today.replace(tzinfo=None).astimezone()
+            self.df = self.df.append({"start_date_local": today_local, "analytics": {}}, ignore_index=True)
+
             return self.calculate_fitness_performance()
 
         return {}
+
+    def timestamp_date(self, ts: pd.Timestamp):
+        return ts.to_pydatetime().replace(tzinfo=None).astimezone(self.timezone).strftime("%Y-%m-%d")
 
     def calculate_fitness_performance(self):
         atl_days = 7
@@ -102,17 +110,17 @@ class ProgressAnalyzer():
         self.df['date'] = pd.to_datetime(self.df['start_date_local'], utc=True)
         self.df.set_index('date', inplace=True)
 
-        # Use hrss as stress_score
         self.df['hrss'] = self.df["analytics"].map(lambda a: a.get('hrss', 0) if type(a) is dict else 0).fillna(0)
-        self.df['stress_score'] = self.df['hrss']
-        self.df = self.df[['stress_score']].resample('D').sum()
+        self.df = self.df[['hrss']].resample('D').sum()
 
-        # Calculate perf.
-        self.df['ctl'] = self.df['stress_score'].rolling(ctl_days, min_periods=1).mean()
-        self.df['atl'] = self.df['stress_score'].rolling(atl_days, min_periods=1).mean()
+        # Calculate perf. using hrss for now
+        self.df['ctl'] = self.df['hrss'].rolling(ctl_days, min_periods=1).mean()
+        self.df['atl'] = self.df['hrss'].rolling(atl_days, min_periods=1).mean()
         self.df['tsb'] = self.df['ctl'] - self.df['atl']
 
-        return {
-            k.to_pydatetime().astimezone(self.timezone).strftime("%Y-%m-%d"): v
+        self.df.drop(columns='hrss', inplace=True)
+
+        return [
+            {**v, "date": self.timestamp_date(k)}
             for k, v in self.df.to_dict(orient="index").items()
-        }
+        ]

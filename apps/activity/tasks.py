@@ -8,13 +8,35 @@ from huey.contrib.djhuey import db_periodic_task, db_task
 from social_django.models import UserSocialAuth
 from stravalib.client import Client
 
-from apps.activity.models import Activity
-from apps.activity.analyzer import SingleAnalyzer, ProgressAnalyzer
+from apps.activity.models import Activity, Analytic
 
 PROCESS_TIME = timedelta(minutes=5)
 PULL_LIMIT = 200
 STREAM_TYPES = ['time', 'latlng', 'distance', 'altitude', 'velocity_smooth',
                 'heartrate', 'cadence', 'watts', 'temp', 'moving', 'grade_smooth']
+
+
+@db_task()
+def update_trend_analytics(athlete_id):
+    from apps.activity.analyzer import TrendAnalyzer
+    ta = TrendAnalyzer(athlete_id)
+    trend = ta.analyze()
+
+    if trend and trend[0]['date']:
+        date = trend[0]['date']
+        Analytic.objects.update_or_create(
+            date=date, timezone=ta.timezone.tzname, user=ta.user,
+            defaults={"finess": trend}
+        )
+
+
+@db_task()
+def update_activity_analytics(activity_id):
+    from apps.activity.analyzer import PointAnalyzer
+    pa = PointAnalyzer(activity_id)
+
+    pa.activity.analytics = pa.analyze()
+    pa.activity.save()
 
 
 def get_client(auth_user):
@@ -44,6 +66,7 @@ def import_activity(client, auth_user, activity_id):
         activity = Activity.upsert(auth_user.user_id, detail, streams)
         print("Created Strava activity:", activity)
 
+        update_activity_analytics(activity.id)
         activity.get_start_location()
         activity.get_map_file()
     except Exception:
@@ -100,15 +123,10 @@ def back_fill(athlete_id):
             count = 0
 
 
-@db_task()
-def update_analytics(uid):
-    pass
-
-
 # TODO: Use webhook for this
 @db_periodic_task(crontab(minute='*/5'))
 def check_for_new_activities():
     for ua in UserSocialAuth.objects.filter(provider='strava'):
         imported = import_activities(ua.uid)
         if imported:
-            update_analytics(ua.uid)
+            update_trend_analytics(ua.uid)
