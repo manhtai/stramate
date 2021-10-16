@@ -7,32 +7,32 @@
 {% block main %}
   <section class="flex items-center justify-start my-10 space-x-2">
     <h1 class="text-4xl font-bold">
-        {{ activity.name }}
+      Settings
     </h1>
   </section>
 
   <section class="mb-8 space-y-2">
     <section class="flex items-center justify-between space-x-4">
       <h2 class="text-lg font-medium opacity-50">
-        Configure activity display
+        These metrics are used to calculate your performance
       </h2>
     </section>
     <form method="post" class="p-4 mt-8 border rounded space-y-6">
         {{ form.non_field_errors }}
         <div>
-            <label for="{{ form.name.id_for_label }}">Name:</label>
-            {{ form.name }}
-            {{ form.name.errors }}
+            <label for="{{ form.sex.id_for_label }}">Sex:</label>
+            {{ form.sex }}
+            {{ form.sex.errors }}
         </div>
         <div>
-            <label for="{{ form.description.id_for_label }}">Description:</label>
-            {{ form.description }}
-            {{ form.description.errors }}
+            <label for="{{ form.birthday.id_for_label }}">Birthday: (YYYY-MM-DD)</label>
+            {{ form.birthday }}
+            {{ form.birthday.errors }}
         </div>
         <div>
-            <label for="{{ form.initial_rotation.id_for_label }}">Initial map rotation:</label>
-            {{ form.initial_rotation }}
-            {{ form.initial_rotation.errors }}
+            <label for="{{ form.resting_hr.id_for_label }}">Resting heart rate: (bpm)</label>
+            {{ form.resting_hr }}
+            {{ form.resting_hr.errors }}
         </div>
 
         <div class="space-x-2">

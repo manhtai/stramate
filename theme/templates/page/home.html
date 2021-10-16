@@ -5,7 +5,7 @@
 {% load tz %}
 
 {% block main %}
-  <section class="flex items-center justify-start space-x-2 my-10">
+  <section class="flex items-center justify-start my-10 space-x-2">
     <h1 class="text-4xl font-bold">
       Hello, {{ user.username }}!
     </h1>
@@ -19,21 +19,4 @@
     </section>
     {% include "activity/progress.html" %}
   </section>
-
-  {% if activity %}
-  <section class="mb-8 space-y-2">
-    <section class="flex items-center justify-between space-x-4">
-      <h2 class="text-lg font-medium">
-        Your latest activity
-      </h2>
-      <a href="{% url "page:athlete" user.username %}" class="text-link opacity-50">
-        Profile
-        {% heroicon_outline "chevron-right" class="w-4 h-4" %}
-      </a>
-    </section>
-    <ul>
-      {% include "page/_activity.html" %}
-    </ul>
-  </section>
-  {% endif %}
 {% endblock %}

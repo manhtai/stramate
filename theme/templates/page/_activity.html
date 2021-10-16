@@ -3,7 +3,7 @@
 {% load heroicons %}
 {% load static %}
 
-<li class="px-4 py-6 border rounded bg-gray-50 space-y-4 relative">
+<li class="relative px-4 py-6 border rounded bg-gray-50 space-y-4">
   <section class="flex items-center justify-between space-x-2">
     <p class="text-xs">
       {% timezone activity.timezone %}
@@ -13,7 +13,9 @@
       &middot; {% firstof activity.start_location "Somewhere" %}
     </p>
     {% if request.user == activity.user %}
-      <a href="{% url "activity:detail" activity.id %}" class="text-link opacity-50">
+      <a href="{% url "activity:detail" activity.id %}"
+         class="opacity-50 text-link"
+         title="Edit this activity">
         {% heroicon_outline "pencil-alt" class="w-4 h-4" %}
       </a>
     {% endif %}

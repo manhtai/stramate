@@ -6,7 +6,7 @@
     <nav class="flex items-center mr-8 md:hidden">
         <a href="/" class="text-link">
             {% heroicon_outline "home" class="w-4 h-4 mr-1" %}
-            <p class="font-medium"/>StraMate</p>
+            <p class="font-medium">StraMate</p>
         </a>
     </nav>
     <button
@@ -37,7 +37,11 @@
     </nav>
     <nav class="flex flex-col items-start justify-end opacity-70 md:flex-row md:space-x-4 md:items-center md:space-y-0 space-y-3 " x-cloak>
         {% if user.is_authenticated %}
-        <a href="/account/logout" class="text-link" title="Log out">
+        <a href="{% url "account:athlete" %}" class="text-link" title="Athlete configuration">
+            {% heroicon_outline "cog" class="w-4 h-4 mr-1" %}
+            Settings
+        </a>
+        <a href="{% url "account:logout" %}" class="text-link" title="Log out">
             {% heroicon_outline "logout" class="w-4 h-4 mr-1" %}
             Log out
         </a>

@@ -27,6 +27,22 @@ FIELD_DEFAULTS = {
 }
 
 
+class Analytic(models.Model):
+    date = models.DateField()
+    timezone = models.TextField()
+
+    heatmap = models.JSONField()
+    fitness = models.JSONField()
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Analytics for {self.user} on {self.date}"
+
+    class Meta:
+        unique_together = (('date', 'user'),)
+
+
 class Activity(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
 
@@ -49,6 +65,9 @@ class Activity(models.Model):
     # Full data
     detail = models.JSONField()
     streams = models.JSONField()
+
+    # Analytics
+    analytics = models.JSONField()
 
     # Relation
     athlete_id = models.PositiveIntegerField()
@@ -113,16 +132,16 @@ class Activity(models.Model):
 
     @classmethod
     def get_last_year_stats(cls, user_id):
+        all_time_total = Activity.objects.filter(user_id=user_id).count()
+
         last_year = datetime.today() - timedelta(days=366)
         user_activities = Activity.objects.filter(
             user_id=user_id,
             start_date_local__gte=last_year,
-        )
+        ).order_by('start_date')
 
-        tz = user_activities.values("timezone") \
-            .annotate(count=Count('timezone')) \
-            .order_by("-count").first()
-        timezone = tz['timezone'] if tz else "UTC"
+        last = user_activities.last()
+        timezone = last.timezone if last else "UTC"
 
         today = datetime.now().astimezone(pytz.timezone(timezone))
 
@@ -152,6 +171,7 @@ class Activity(models.Model):
         ]
 
         return {
+            "all_time_total": all_time_total,
             "last_year_total": last_year_total,
             "last_year_moving": last_year_moving,
         }
@@ -205,10 +225,10 @@ class Activity(models.Model):
 
     @staticmethod
     def _get_units(diff):
-        d = int(diff / 86400)
-        h = int((diff - (d * 86400)) / 3600)
-        m = int((diff - (d * 86400 + h * 3600)) / 60)
-        s = int((diff - (d * 86400 + h * 3600 + m * 60)))
+        d = int(diff / 86_400)
+        h = int((diff - (d * 86_400)) / 3_600)
+        m = int((diff - (d * 86_400 + h * 3_600)) / 60)
+        s = int((diff - (d * 86_400 + h * 3_600 + m * 60)))
         return [d, h, m, s]
 
     def _get_place_name(self, lat, lon):

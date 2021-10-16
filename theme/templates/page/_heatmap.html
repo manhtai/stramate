@@ -4,17 +4,23 @@
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
     <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
-    {% if request.user.username == username %}
-      <a href="/" class="text-link opacity-50">
-        Progress
-        {% heroicon_outline "chart-bar" class="w-4 h-4 ml-1" %}
-      </a>
-    {% endif %}
   </section>
 
-  <section class="px-4 border rounded overflow-hidden flex items-center justify-end">
+  <section class="flex items-center justify-end px-4 overflow-hidden border rounded">
     <section style="width: 718px; height: 143px;">
-      <canvas id="myChart" style="width: 718px; height: 143px;"></canvas>
+      <canvas id="heatmap" style="width: 718px; height: 143px;"></canvas>
+    </section>
+  </section>
+</section>
+
+<section class="mb-8 space-y-2">
+  <section class="flex items-center justify-between space-x-4">
+    <h2 class="text-lg font-medium">Performance over the year</h2>
+  </section>
+
+  <section class="flex items-center justify-end px-4 overflow-hidden border rounded">
+    <section style="width: 718px; height: 359px;">
+      <canvas style="width: 718px; height: 359px;" id="fitness"></canvas>
     </section>
   </section>
 </section>
@@ -24,6 +30,7 @@
 <script src="//cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.1.0/dist/chartjs-chart-matrix.min.js"></script>
 
 <script>
+  // ==================== Heatmap start ====================
   const scales = {
     y: {
       type: 'time',
@@ -119,11 +126,11 @@
       return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
   }
 
-    const getBorderColor = (c) => {
-      const value = c.dataset.data[c.dataIndex].v;
-      const alpha = value / 7200;
-      return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
-    }
+  const getBorderColor = (c) => {
+    const value = c.dataset.data[c.dataIndex].v;
+    const alpha = value / 7200;
+    return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
+  }
 
   const data = {
     datasets: [{
@@ -161,6 +168,95 @@
     options: options
   };
 
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var myChart = new Chart(ctx, config);
+  var ctx = document.getElementById('heatmap').getContext('2d');
+  var heatmap = new Chart(ctx, config);
+  // ==================== Heatmap end ======================
+
+  // ==================== Fitness start ====================
+  const ftData = {{ fitness|safe }};
+  const ftConfig = {
+    type: 'line',
+    data: {
+      labels: ftData.map(o => o.x),
+      datasets: [
+        {
+          label: "Fitness",
+          data: ftData.map(d => d.ctl),
+          yAxisID: 'ctl',
+          borderColor: "rgba(5, 150, 105, 0.8)",
+          backgroundColor: "rgba(5, 150, 105, 0.5)",
+          pointRadius: 0,
+        },
+        {
+          label: "Fatigue",
+          data: ftData.map(d => d.atl),
+          yAxisID: 'atl',
+          borderColor: "rgba(209, 213, 219, 0.8)",
+          backgroundColor: "rgba(209, 213, 219, 0.5)",
+          pointRadius: 0,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins:{
+        legend: false,
+        tooltip: {
+          callbacks: {
+            title([x, y]) {
+              return x.label.split(',').slice(0, 2).join(',');
+            },
+          },
+        },
+      },
+      stacked: false,
+      scales: {
+        x: {
+          type: 'time',
+          grid: {
+            display: false,
+            drawBorder: false,
+            tickLength: 0,
+          },
+          ticks: {
+            autoSkip: true,
+            padding: 20,
+            font: {
+              size: 9,
+            },
+          },
+        },
+        ctl: {
+          display: true,
+          position: 'left',
+          grid: {
+            display: true,
+          },
+        },
+        atl: {
+          display: false,
+          position: 'right',
+          grid: {
+            display: false,
+            drawBorder: false,
+            tickLength: 0,
+          },
+        },
+      },
+      layout: {
+        padding: {
+          top: 40,
+          bottom: 20,
+        }
+      },
+    },
+  };
+
+  var ftCtx = document.getElementById('fitness').getContext('2d');
+  var ftChart = new Chart(ftCtx, ftConfig);
+  // ==================== Fitness end ======================
 </script>

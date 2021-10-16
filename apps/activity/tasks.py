@@ -8,12 +8,37 @@ from huey.contrib.djhuey import db_periodic_task, db_task
 from social_django.models import UserSocialAuth
 from stravalib.client import Client
 
-from apps.activity.models import Activity
+from apps.activity.models import Activity, Analytic
 
 PROCESS_TIME = timedelta(minutes=5)
 PULL_LIMIT = 200
 STREAM_TYPES = ['time', 'latlng', 'distance', 'altitude', 'velocity_smooth',
                 'heartrate', 'cadence', 'watts', 'temp', 'moving', 'grade_smooth']
+
+
+@db_task()
+def update_trend_analytics(athlete_id):
+    from apps.activity.analyzer import TrendAnalyzer
+    ta = TrendAnalyzer(athlete_id)
+    trend = ta.analyze()
+
+    if trend and trend[-1]['x']:
+        date = trend[-1]['x']
+
+        heatmap = Activity.get_last_year_stats(ta.user.id)
+        Analytic.objects.update_or_create(
+            date=date, user=ta.user,
+            defaults={"fitness": trend, "heatmap": heatmap, "timezone": ta.timezone.zone}
+        )
+
+
+@db_task()
+def update_activity_analytics(activity_id):
+    from apps.activity.analyzer import PointAnalyzer
+    pa = PointAnalyzer(activity_id)
+
+    pa.activity.analytics = pa.analyze()
+    pa.activity.save()
 
 
 def get_client(auth_user):
@@ -26,8 +51,11 @@ def get_client(auth_user):
             client_secret=settings.SOCIAL_AUTH_STRAVA_SECRET,
             refresh_token=auth_user.extra_data['refresh_token'],
         )
+
+        epoch_now = int(datetime.utcnow().timestamp())
         auth_user.extra_data['access_token'] = res['access_token']
-        auth_user.extra_data['expires'] = int(res['expires_at'] - datetime.utcnow().timestamp())
+        auth_user.extra_data['expires'] = res['expires_at'] - epoch_now
+        auth_user.extra_data['auth_time'] = epoch_now
         auth_user.save()
 
     return client
@@ -40,6 +68,7 @@ def import_activity(client, auth_user, activity_id):
         activity = Activity.upsert(auth_user.user_id, detail, streams)
         print("Created Strava activity:", activity)
 
+        update_activity_analytics(activity.id)
         activity.get_start_location()
         activity.get_map_file()
     except Exception:
@@ -54,8 +83,12 @@ def import_activities(athlete_id):
     last_import_time = last_activity and last_activity.start_date
     activities = client.get_activities(after=last_import_time, limit=PULL_LIMIT)
 
+    count = 0
     for summary in activities:
         import_activity(client, auth_user, summary.id)
+        count += 1
+
+    return count
 
 
 @db_task()
@@ -96,4 +129,6 @@ def back_fill(athlete_id):
 @db_periodic_task(crontab(minute='*/5'))
 def check_for_new_activities():
     for ua in UserSocialAuth.objects.filter(provider='strava'):
-        import_activities(ua.uid)
+        imported = import_activities(ua.uid)
+        if imported:
+            update_trend_analytics(ua.uid)

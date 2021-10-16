@@ -31,7 +31,6 @@
     @apply space-x-1;
   }
 
-
   .btn-primary {
     @apply bg-gray-900 focus:ring-gray-800;
   }
@@ -84,7 +83,7 @@
     @apply bg-red-400;
   }
 
-  .invalid-feedback {
+  .errorlist {
     @apply text-red-500;
   }
 
