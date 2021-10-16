@@ -16,21 +16,26 @@ class SingleAnalyzer():
         self.athlete = Athlete.objects.get(id=self.activity.athlete_id)
 
     def analyze(self):
+        self.init_metrics()
+
         # We only do heart rate base analytics for now
         if self.activity.detail.get('has_heartrate'):
-            self.init_metrics()
             self.init_df()
-            hrss = self.calculate_heartrate_stress_score()
-            return {"hrss": hrss}
+            self.calculate_heartrate_stress_score()
 
-        return {}
+        return {
+            "min_hr": self.min_hr,
+            "max_hr": self.min_hr,
+            "hrss": self.hrss,
+        }
 
     def init_metrics(self):
         self.trimp_factor = 1.92 if self.athlete.sex.upper() == 'M' else 1.67
 
         age = relativedelta(datetime.today(), self.athlete.birthday).years
-        self.hr_max = 220 - age
-        self.hr_min = self.athlete.resting_hr
+        self.max_hr = 220 - age
+        self.min_hr = self.athlete.resting_hr
+        self.hrss = 0
 
     def init_df(self):
         # Which streams will be analyzed
@@ -52,17 +57,15 @@ class SingleAnalyzer():
         self.df = self.df.interpolate(limit_direction='both')
 
     def calculate_heartrate_stress_score(self):
-        athlete_lthr = ((self.hr_max - self.hr_min) * 0.85) + self.hr_min  # Karvonen formula
+        athlete_lthr = ((self.max_hr - self.min_hr) * 0.85) + self.min_hr  # Karvonen formula
 
-        self.df['hrr'] = self.df['heartrate'].apply(lambda x: (x - self.hr_min) / (self.hr_max - self.hr_min))
+        self.df['hrr'] = self.df['heartrate'].apply(lambda x: (x - self.min_hr) / (self.max_hr - self.min_hr))
 
         self.trimp = ((1 / 60) * self.df['hrr'] * (
             0.64 * np.exp(self.trimp_factor * self.df['hrr']))).sum()
 
-        athlete_hrr_lthr = (athlete_lthr - self.hr_min) / (self.hr_max - self.hr_min)
-        hrss = (self.trimp / (60 * athlete_hrr_lthr * (0.64 * np.exp(self.trimp_factor * athlete_hrr_lthr)))) * 100
-
-        return hrss
+        athlete_hrr_lthr = (athlete_lthr - self.min_hr) / (self.max_hr - self.min_hr)
+        self.hrss = (self.trimp / (60 * athlete_hrr_lthr * (0.64 * np.exp(self.trimp_factor * athlete_hrr_lthr)))) * 100
 
 
 class ProgressAnalyzer():
@@ -78,9 +81,9 @@ class ProgressAnalyzer():
         ).order_by('start_date')
 
         last = user_activities.last()
-        timezone = last.timezone if last else "UTC"
+        self.timezone = pytz.timezone(last.timezone if last else "UTC")
 
-        today = datetime.now().astimezone(pytz.timezone(timezone))
+        today = datetime.now().astimezone(self.timezone)
         last_year = today - timedelta(days=366)
 
         user_analytics = user_activities.values("analytics", "start_date_local")
@@ -109,5 +112,7 @@ class ProgressAnalyzer():
         self.df['atl'] = self.df['stress_score'].rolling(atl_days, min_periods=1).mean()
         self.df['tsb'] = self.df['ctl'] - self.df['atl']
 
-        self.df.drop(['stress_score'])
-        return self.df.to_dict(orient="index")
+        return {
+            k.to_pydatetime().astimezone(self.timezone).strftime("%Y-%m-%d"): v
+            for k, v in self.df.to_dict(orient="index").items()
+        }

@@ -9,6 +9,7 @@ from social_django.models import UserSocialAuth
 from stravalib.client import Client
 
 from apps.activity.models import Activity
+from apps.activity.analyzer import SingleAnalyzer, ProgressAnalyzer
 
 PROCESS_TIME = timedelta(minutes=5)
 PULL_LIMIT = 200
@@ -57,8 +58,12 @@ def import_activities(athlete_id):
     last_import_time = last_activity and last_activity.start_date
     activities = client.get_activities(after=last_import_time, limit=PULL_LIMIT)
 
+    count = 0
     for summary in activities:
         import_activity(client, auth_user, summary.id)
+        count += 1
+
+    return count
 
 
 @db_task()
@@ -95,8 +100,15 @@ def back_fill(athlete_id):
             count = 0
 
 
+@db_task()
+def update_analytics(uid):
+    pass
+
+
 # TODO: Use webhook for this
 @db_periodic_task(crontab(minute='*/5'))
 def check_for_new_activities():
     for ua in UserSocialAuth.objects.filter(provider='strava'):
-        import_activities(ua.uid)
+        imported = import_activities(ua.uid)
+        if imported:
+            update_analytics(ua.uid)
