@@ -19,7 +19,9 @@
   </section>
 
   <section class="flex items-center justify-end px-4 overflow-hidden border rounded">
-    <canvas id="fitness"></canvas>
+    <section style="width: 718px; height: 359px;">
+      <canvas style="width: 718px; height: 359px;" id="fitness"></canvas>
+    </section>
   </section>
 </section>
 
@@ -181,15 +183,17 @@
           label: "Fitness",
           data: ftData.map(d => d.ctl),
           yAxisID: 'ctl',
-          borderColor: 'blue',
-          backgroundColor: 'blue',
+          borderColor: "rgba(5, 150, 105, 0.8)",
+          backgroundColor: "rgba(5, 150, 105, 0.5)",
+          pointRadius: 0,
         },
         {
-          label: "Freshness",
+          label: "Fatigue",
           data: ftData.map(d => d.atl),
           yAxisID: 'atl',
-          borderColor: 'green',
-          backgroundColor: 'green',
+          borderColor: "rgba(209, 213, 219, 0.8)",
+          backgroundColor: "rgba(209, 213, 219, 0.5)",
+          pointRadius: 0,
         },
       ]
     },
@@ -199,28 +203,60 @@
         mode: 'index',
         intersect: false,
       },
+      plugins:{
+        legend: false,
+        tooltip: {
+          callbacks: {
+            title([x, y]) {
+              return x.label.split(',').slice(0, 2).join(',');
+            },
+          },
+        },
+      },
       stacked: false,
       scales: {
         x: {
           type: 'time',
+          grid: {
+            display: false,
+            drawBorder: false,
+            tickLength: 0,
+          },
+          ticks: {
+            autoSkip: true,
+            padding: 20,
+            font: {
+              size: 9,
+            },
+          },
         },
         ctl: {
           display: true,
           position: 'left',
-        },
-        atl: {
-          display: true,
-          position: 'right',
           grid: {
-            drawOnChartArea: false,
+            display: true,
           },
         },
+        atl: {
+          display: false,
+          position: 'right',
+          grid: {
+            display: false,
+            drawBorder: false,
+            tickLength: 0,
+          },
+        },
+      },
+      layout: {
+        padding: {
+          top: 40,
+          bottom: 20,
+        }
       },
     },
   };
 
   var ftCtx = document.getElementById('fitness').getContext('2d');
   var ftChart = new Chart(ftCtx, ftConfig);
-  console.log(ftConfig)
   // ==================== Fitness end ======================
 </script>
