@@ -10,6 +10,12 @@ poetry run python manage.py migrate
 poetry run honcho start
 ```
 
+## Features
+
+- [x] Activities heat map
+- [x] Fitness & fatigue performance chart
+- [x] Interactive 3D map
+
 ## Deployment
 
 - [x] Use `sqlite` for database, no `postgres` or `mysql`

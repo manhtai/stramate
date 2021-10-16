@@ -5,7 +5,6 @@ from django.core.paginator import Paginator
 
 from django.urls import reverse_lazy
 from apps.activity.models import Activity, Analytic
-from apps.activity.tasks import update_trend_analytics
 
 
 PAGE_SIZE = 3
@@ -32,14 +31,11 @@ class ProfileView(TemplateView):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
 
+        stats = {}
         analytic = Analytic.objects.filter(user_id=user.id).last()
         if analytic:
             stats = analytic.heatmap
             stats["fitness"] = analytic.fitness
-        else:
-            athlete = user.social_auth.first()
-            update_trend_analytics(athlete.uid)
-            stats = {}
 
         user_activities = Activity.objects.filter(
             user_id=user.id
