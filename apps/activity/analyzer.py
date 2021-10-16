@@ -103,6 +103,7 @@ class TrendAnalyzer():
         return ts.to_pydatetime().replace(tzinfo=None).astimezone(self.timezone).strftime("%Y-%m-%d")
 
     def calculate_fitness_performance(self):
+        # Ref: https://www.trainingpeaks.com/coach-blog/a-coachs-guide-to-atl-ctl-tsb/
         atl_days = 7
         ctl_days = 42
 
