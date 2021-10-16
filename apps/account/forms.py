@@ -1,5 +1,5 @@
 from django import forms
-from django.forms.widgets import DateInput, NumberInput
+from django.forms.widgets import DateInput, NumberInput, Select
 
 from apps.account.models import Athlete
 
@@ -7,14 +7,16 @@ from apps.account.models import Athlete
 class AthleteForm(forms.ModelForm):
     birthday = forms.DateField(widget=DateInput(attrs={'class': "form-control form-block"}))
 
-    hr_zone_threshold_1 = forms.FloatField(widget=NumberInput(attrs={'class': "form-control form-block"}))
-    hr_zone_threshold_2 = forms.FloatField(widget=NumberInput(attrs={'class': "form-control form-block"}))
-    hr_zone_threshold_3 = forms.FloatField(widget=NumberInput(attrs={'class': "form-control form-block"}))
-    hr_zone_threshold_4 = forms.FloatField(widget=NumberInput(attrs={'class': "form-control form-block"}))
+    sex = forms.ChoiceField(
+        widget=Select(attrs={'class': "form-control form-block"}),
+        choices=(("", "Other"), ("M", "Male"), ("F", "Female")),
+    )
+    resting_hr = forms.IntegerField(widget=NumberInput(attrs={'class': "form-control form-block"}))
 
     class Meta:
         model = Athlete
         fields = [
+            'sex',
             'birthday',
-            'hr_zone_threshold_1', 'hr_zone_threshold_2', 'hr_zone_threshold_3', 'hr_zone_threshold_4',
+            'resting_hr',
         ]

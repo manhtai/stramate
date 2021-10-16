@@ -50,6 +50,9 @@ class Activity(models.Model):
     detail = models.JSONField()
     streams = models.JSONField()
 
+    # Analytics
+    analytics = models.JSONField()
+
     # Relation
     athlete_id = models.PositiveIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
