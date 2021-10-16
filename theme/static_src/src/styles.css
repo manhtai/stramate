@@ -31,7 +31,6 @@
     @apply space-x-1;
   }
 
-
   .btn-primary {
     @apply bg-gray-900 focus:ring-gray-800;
   }

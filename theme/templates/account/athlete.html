@@ -7,7 +7,7 @@
 {% block main %}
   <section class="flex items-center justify-start my-10 space-x-2">
     <h1 class="text-4xl font-bold">
-      Configuration
+      Settings
     </h1>
   </section>
 
@@ -45,7 +45,12 @@
             {{ form.hr_zone_threshold_4.errors }}
         </div>
 
-        <input type="submit" value="Update" class="w-full btn btn-lg btn-primary">
+        <div class="space-x-2">
+          <input type="submit" value="Update" class="btn btn-primary">
+          <a href="{% url "page:profile" request.user.username %}" class="btn btn-outline">
+            Cancel
+          </a>
+        </div>
         {% csrf_token %}
     </form>
   </section>
