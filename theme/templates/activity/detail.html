@@ -13,31 +13,26 @@
 
   <section class="mb-8 space-y-2">
     <section class="flex items-center justify-between space-x-4">
-      <a href="{% url "page:athlete" activity.user.username %}" class="text-lg font-medium opacity-50 text-link">
-        {% heroicon_outline "chevron-left" class="w-4 h-4" %}
-        Profile
-      </a>
-      <a href="{% url "page:athlete" user.username %}" class="opacity-50 text-link">
-        Route
-        {% heroicon_outline "external-link" class="w-4 h-4 ml-1" %}
-      </a>
+      <h2 class="text-lg font-medium opacity-50">
+        Configure activity display
+      </h2>
     </section>
-    <form method="post" class="px-4 py-6 mt-8 border rounded space-y-6">
+    <form method="post" class="p-4 mt-8 border rounded space-y-6">
         {{ form.non_field_errors }}
         <div>
-            {{ form.name.errors }}
             <label for="{{ form.name.id_for_label }}">Name:</label>
             {{ form.name }}
+            {{ form.name.errors }}
         </div>
         <div>
-            {{ form.description.errors }}
             <label for="{{ form.description.id_for_label }}">Description:</label>
             {{ form.description }}
+            {{ form.description.errors }}
         </div>
         <div>
-            {{ form.initial_rotation.errors }}
             <label for="{{ form.initial_rotation.id_for_label }}">Initial map rotation:</label>
             {{ form.initial_rotation }}
+            {{ form.initial_rotation.errors }}
         </div>
 
         <input type="submit" value="Update" class="w-full btn btn-lg btn-primary">

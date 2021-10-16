@@ -16,24 +16,7 @@
       <h2 class="text-lg font-medium">
         Your fitness progress
       </h2>
-      <a href="{% url "page:athlete" user.username %}" class="opacity-50 text-link">
-        Your profile
-        {% heroicon_outline "chevron-right" class="w-4 h-4" %}
-      </a>
     </section>
     {% include "activity/progress.html" %}
   </section>
-
-  {% if activity %}
-  <section class="mb-8 space-y-2">
-    <section class="flex items-center justify-between space-x-4">
-      <h2 class="text-lg font-medium">
-        Your latest activity
-      </h2>
-    </section>
-    <ul>
-      {% include "page/_activity.html" %}
-    </ul>
-  </section>
-  {% endif %}
 {% endblock %}

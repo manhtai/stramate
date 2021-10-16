@@ -4,15 +4,9 @@
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
     <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
-    {% if request.user.username == username %}
-      <a href="/" class="text-link opacity-50">
-        Your progress
-        {% heroicon_outline "chart-bar" class="w-4 h-4 ml-1" %}
-      </a>
-    {% endif %}
   </section>
 
-  <section class="px-4 border rounded overflow-hidden flex items-center justify-end">
+  <section class="flex items-center justify-end px-4 overflow-hidden border rounded">
     <section style="width: 718px; height: 143px;">
       <canvas id="myChart" style="width: 718px; height: 143px;"></canvas>
     </section>

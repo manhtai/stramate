@@ -26,8 +26,11 @@ def get_client(auth_user):
             client_secret=settings.SOCIAL_AUTH_STRAVA_SECRET,
             refresh_token=auth_user.extra_data['refresh_token'],
         )
+
+        epoch_now = int(datetime.utcnow().timestamp())
         auth_user.extra_data['access_token'] = res['access_token']
-        auth_user.extra_data['expires'] = int(res['expires_at'] - datetime.utcnow().timestamp())
+        auth_user.extra_data['expires'] = res['expires_at'] - epoch_now
+        auth_user.extra_data['auth_time'] = epoch_now
         auth_user.save()
 
     return client

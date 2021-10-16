@@ -84,7 +84,7 @@
     @apply bg-red-400;
   }
 
-  .invalid-feedback {
+  .errorlist {
     @apply text-red-500;
   }
 

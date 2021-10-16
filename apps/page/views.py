@@ -19,15 +19,13 @@ class IndexView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         if self.request.user.is_authenticated:
-            context["activity"] = Activity.objects.filter(
-                user_id=self.request.user.id
-            ).last()
+            pass
 
         return context
 
 
-class AthleteView(TemplateView):
-    template_name = "page/athlete.html"
+class ProfileView(TemplateView):
+    template_name = "page/profile.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
