@@ -1,5 +1,5 @@
 from apps.activity.tasks import back_fill
-from apps.activity.models import Athlete
+from apps.account.models import Athlete
 
 
 def initialize_activities_import(uid, is_new, user, *args, **kwargs):
