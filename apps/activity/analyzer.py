@@ -77,11 +77,11 @@ class TrendAnalyzer():
         last_year = datetime.today() - timedelta(days=366)
         user_activities = Activity.objects.filter(
             athlete_id=self.athlete_id,
-            start_date__gte=last_year,
+            start_date_local__gte=last_year,
         ).order_by('start_date')
 
         last = user_activities.last()
-        self.timezone = pytz.timezone(last.timezone if last else "UTC")
+        self.timezone = pytz.timezone(last and last.timezone or "UTC")
         self.user = last.user
 
         today = datetime.now().astimezone(self.timezone)
@@ -122,6 +122,6 @@ class TrendAnalyzer():
         self.df.drop(columns='hrss', inplace=True)
 
         return [
-            {**v, "date": self.timestamp_date(k)}
+            {**v, "x": self.timestamp_date(k)}
             for k, v in self.df.to_dict(orient="index").items()
         ]

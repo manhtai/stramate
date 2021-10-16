@@ -22,11 +22,13 @@ def update_trend_analytics(athlete_id):
     ta = TrendAnalyzer(athlete_id)
     trend = ta.analyze()
 
-    if trend and trend[0]['date']:
-        date = trend[0]['date']
+    if trend and trend[-1]['x']:
+        date = trend[-1]['x']
+
+        heatmap = Activity.get_last_year_stats(ta.user.id)
         Analytic.objects.update_or_create(
-            date=date, timezone=ta.timezone.tzname, user=ta.user,
-            defaults={"finess": trend}
+            date=date, user=ta.user,
+            defaults={"fitness": trend, "heatmap": heatmap, "timezone": ta.timezone.zone}
         )
 
 

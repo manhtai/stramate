@@ -132,6 +132,8 @@ class Activity(models.Model):
 
     @classmethod
     def get_last_year_stats(cls, user_id):
+        all_time_total = Activity.objects.filter(user_id=user_id).count()
+
         last_year = datetime.today() - timedelta(days=366)
         user_activities = Activity.objects.filter(
             user_id=user_id,
@@ -169,6 +171,7 @@ class Activity(models.Model):
         ]
 
         return {
+            "all_time_total": all_time_total,
             "last_year_total": last_year_total,
             "last_year_moving": last_year_moving,
         }
