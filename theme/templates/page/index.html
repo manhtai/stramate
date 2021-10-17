@@ -1,4 +1,79 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block before_main %}
+{% endblock %}
+
+{% block after_main %}
+{% endblock %}
 
 {% block main %}
+<section class="flex flex-col items-center justify-center px-4 h-80 text-center bg-gray-50">
+  <section class="max-w-2xl space-y-4">
+    <p class="text-5xl font-semibold">
+      StraMate
+    </p>
+    <p class="text-2xl">
+      A self-hosted data analyzer for your activities.
+    </p>
+  </section>
+</section>
+
+<section class="px-4 bg-gray-100 py-10">
+  <section class="max-w-3xl mx-auto flex flex-col items-center justify-center text-center">
+    <img
+      src="{% static 'img/heatmap.png' %}"
+      alt="Heat map"
+      class="rounded-lg my-4"
+    />
+    <h3 class="text-2xl my-4">Moving time heat map</h3>
+  </section>
+</section>
+
+<section class="px-4 bg-gray-50 py-10">
+  <section class="max-w-3xl mx-auto flex flex-col items-center justify-center text-center">
+    <img
+      src="{% static 'img/fitness.png' %}"
+      alt="Heat map"
+      class="rounded-lg my-4"
+    />
+    <h3 class="text-2xl my-4">Fitness &amp; Fatigue performance</h3>
+  </section>
+</section>
+
+<section class="px-4 bg-gray-100 py-10">
+  <section class="max-w-3xl mx-auto flex flex-col items-center justify-center text-center">
+    <img
+      src="{% static 'img/3d.png' %}"
+      alt="3d map"
+      class="rounded-lg my-4"
+    />
+    <h3 class="text-2xl my-4">Interactive 3D map</h3>
+  </section>
+</section>
+
+<section class="px-4 py-10">
+  <section class="max-w-3xl mx-auto flex h-60 flex-col items-center justify-center">
+    <img
+      src="{% static 'img/strava.svg' %}"
+      alt="Strava sync"
+      class="rounded-lg my-4 w-48"
+    />
+    <h3 class="text-2xl my-4">Auto-sync with Strava</h3>
+  </section>
+</section>
+
+<section class="px-4 py-10 bg-gray-100">
+  <section class="max-w-3xl mx-auto flex h-60 flex-col items-center justify-center">
+    <a href="https://github.com/manhtai/stramate">
+      <img
+        src="{% static 'img/github.png' %}"
+        alt="Open source"
+        class="rounded-lg my-2 w-48"
+      />
+    </a>
+    <h3 class="text-2xl my-4">Open-source on GitHub</h3>
+  </section>
+</section>
+
 {% endblock %}

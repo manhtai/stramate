@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import TemplateView
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.generic import TemplateView, View
 from django.core.paginator import Paginator
 
 from django.urls import reverse_lazy
@@ -10,16 +10,11 @@ from apps.activity.models import Activity, Analytic
 PAGE_SIZE = 3
 
 
-class IndexView(TemplateView):
-    def get_template_names(self):
-        if self.request.user.is_authenticated:
-            return ["page/home.html"]
-        return ["page/index.html"]
-
+class IndexView(View):
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
             return redirect(reverse_lazy("page:profile", args=(self.request.user.username,)))
-        return super().get(*args, **kwargs)
+        return render(self.request, "page/index.html")
 
 
 class ProfileView(TemplateView):

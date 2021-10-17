@@ -15,9 +15,17 @@
 
     <body class="text-sm text-gray-600 bg-gray-50">
         {% include "_header.html" %}
-        <main class="max-w-3xl px-2 mx-auto">
-            {% block main %}{% endblock %}
-        </main>
+
+        {% block before_main %}
+            <main class="max-w-3xl px-2 mx-auto">
+        {% endblock %}
+
+        {% block main %}{% endblock %}
+
+        {% block after_main %}
+            </main>
+        {% endblock %}
+
         {% include "_footer.html" %}
     </body>
 </html>
