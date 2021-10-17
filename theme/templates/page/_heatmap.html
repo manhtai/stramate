@@ -216,6 +216,7 @@
       stacked: false,
       scales: {
         x: {
+          offset: true,
           type: 'time',
           grid: {
             display: false,
@@ -224,13 +225,13 @@
           },
           ticks: {
             autoSkip: true,
-            padding: 20,
             font: {
               size: 9,
             },
           },
         },
         ctl: {
+          offset: true,
           display: true,
           position: 'left',
           grid: {
@@ -238,6 +239,7 @@
           },
         },
         atl: {
+          offset: true,
           display: false,
           position: 'right',
           grid: {
@@ -249,8 +251,8 @@
       },
       layout: {
         padding: {
-          top: 40,
-          bottom: 20,
+          top: 30,
+          bottom: 30,
         }
       },
     },
