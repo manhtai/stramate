@@ -2,6 +2,7 @@ import time
 import traceback
 from datetime import datetime, timedelta
 
+import pytz
 from django.conf import settings
 from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, db_task
@@ -30,6 +31,9 @@ def update_trend_analytics(athlete_id):
             date=date, user=ta.user,
             defaults={"fitness": trend, "heatmap": heatmap, "timezone": ta.timezone.zone}
         )
+
+        # Clean up
+        Analytic.objects.filter(date__lt=date, user=ta.user).delete()
 
 
 @db_task()
@@ -128,7 +132,26 @@ def back_fill(athlete_id):
 # TODO: Use webhook for this
 @db_periodic_task(crontab(minute='*/5'))
 def check_for_new_activities():
-    for ua in UserSocialAuth.objects.filter(provider='strava'):
+    for ua in UserSocialAuth.objects.iterator():
         imported = import_activities(ua.uid)
         if imported:
+            update_trend_analytics(ua.uid)
+
+
+@db_periodic_task(crontab(minute='1'))
+def build_cache_for_new_day():
+    for ua in UserSocialAuth.objects.iterator():
+        last_analytic = Analytic.objects.filter(user=ua.user).order_by('date').last()
+        today = datetime.utcnow()
+
+        should_build = False
+
+        if not last_analytic:
+            should_build = True
+        else:
+            today = today.astimezone(pytz.timezone(last_analytic.timezone))
+            if last_analytic.date != today.date:
+                should_build = True
+
+        if should_build:
             update_trend_analytics(ua.uid)

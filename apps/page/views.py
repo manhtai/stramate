@@ -27,7 +27,7 @@ class ProfileView(TemplateView):
         user = get_object_or_404(User, username=username)
 
         stats = {}
-        analytic = Analytic.objects.filter(user_id=user.id).last()
+        analytic = Analytic.objects.filter(user_id=user.id).order_by('date').last()
         if analytic:
             stats = analytic.heatmap
             stats["fitness"] = analytic.fitness
