@@ -1,22 +1,15 @@
-{% load tz %}
 {% load humanize %}
 {% load heroicons %}
 {% load static %}
 
 <li class="relative px-4 py-6 border rounded bg-gray-50 space-y-4">
   <section class="flex items-center justify-between space-x-2">
-    <p class="text-xs">
-      {% timezone activity.timezone %}
-        {{ activity.start_date|naturalday|title }} at
-        {{ activity.start_date|date:"P" }}
-      {% endtimezone %}
-      {% if activity.start_location %} &middot; {{ activity.start_location }}{% endif %}
-    </p>
+    {% include "page/_activity_date.html" %}
     {% if request.user == activity.user %}
-      <a href="{% url "activity:edit" activity.id %}"
+      <a href="{% url "activity:detail" activity.id %}"
          class="opacity-50 text-link"
-         title="Edit this activity">
-        {% heroicon_outline "pencil-alt" class="w-4 h-4" %}
+         title="View this activity">
+        {% heroicon_outline "link" class="w-4 h-4" %}
       </a>
     {% endif %}
   </section>
@@ -68,9 +61,5 @@
       <p class="text-base">{{ activity.format_moving_time }}</p>
     </section>
   </section>
-  {% if activity.start_location %}
-    <a href="{% url "activity:route" activity.id %}" class="text-link" target="new">
-      <img src="{% get_media_prefix %}{{ activity.map }}" class="rounded" />
-    </a>
-  {% endif %}
+  {% include "page/_activity_map.html" %}
 <li>

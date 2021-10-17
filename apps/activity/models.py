@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from os import path
 from urllib.parse import quote_plus
+from collections import defaultdict
 
 import polyline
 import pytz
@@ -25,6 +26,8 @@ FIELD_DEFAULTS = {
     "average_speed": 0,
     "timezone": "UTC",
 }
+
+HEART_RATE_ZONES = [.6, .7, .8, .9]
 
 
 class Analytic(models.Model):
@@ -137,7 +140,17 @@ class Activity(models.Model):
 
     @property
     def average_hr(self):
-        return f"{self.detail.get('average_heartrate', 0):.0f} bpm"
+        hr = self.detail.get('average_heartrate', 0)
+        if hr:
+            return f"{hr:.0f} bpm"
+        return ""
+
+    @property
+    def max_hr(self):
+        hr = self.detail.get('max_heartrate', 0)
+        if hr:
+            return f"{hr:.0f} bpm"
+        return ''
 
     @classmethod
     def get_last_year_stats(cls, user_id):
@@ -208,8 +221,12 @@ class Activity(models.Model):
         return f"{m}:{s:02} /km"
 
     @property
-    def format_speed(self):
+    def format_speed_mps(self):
         return f"{self.average_speed:.1f} m/s"
+
+    @property
+    def format_speed_kph(self):
+        return f"{self.average_speed * 3.6:.1f} km/h"
 
     @staticmethod
     def format_time(seconds):
@@ -231,6 +248,62 @@ class Activity(models.Model):
     @property
     def format_moving_time(self):
         return self.format_time(self.moving_time)
+
+    @property
+    def heart_rate_zones(self):
+        max_hr = self.analytics.get("max_hr")
+        min_hr = self.analytics.get("min_hr")
+        if not max_hr or not min_hr:
+            return {}
+
+        hrr = max_hr - min_hr
+        z1 = round((hrr * HEART_RATE_ZONES[0]) + min_hr)
+        z2 = round((hrr * HEART_RATE_ZONES[1]) + min_hr)
+        z3 = round((hrr * HEART_RATE_ZONES[2]) + min_hr)
+        z4 = round((hrr * HEART_RATE_ZONES[3]) + min_hr)
+
+        heart_rates = self.streams['heartrate']['data']
+
+        zones = defaultdict(list)
+        for z in map(lambda hr: self.hr_zone(hr, z1, z2, z3, z4), heart_rates):
+            zones[z].append(1)
+
+        seconds = {k: sum(v) for k, v in zones.items()}
+        return [
+            {
+                "zone": i,
+                "zonef": f"Zone {i}",
+                "time": seconds.get(i, 0),
+                "timef": self.format_time(seconds.get(i, 0)),
+            }
+            for i in [1, 2, 3, 4, 5]
+        ]
+
+    @property
+    def stress_score(self):
+        hrss = self.analytics.get("hrss")
+        if hrss:
+            return f"{hrss:.0f}"
+        return "N/A"
+
+    @staticmethod
+    def hr_zone(heartrate, z1, z2, z3, z4):
+        if not heartrate:
+            return None
+
+        if heartrate <= z1:
+            return 1
+
+        if heartrate <= z2:
+            return 2
+
+        if heartrate <= z3:
+            return 3
+
+        if heartrate <= z4:
+            return 4
+
+        return 5
 
     @staticmethod
     def _get_units(diff):

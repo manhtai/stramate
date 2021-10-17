@@ -1,0 +1,7 @@
+{% load static %}
+
+{% if activity.start_location %}
+  <a href="{% url "activity:route" activity.id %}" class="text-link" target="new">
+    <img src="{% get_media_prefix %}{{ activity.map }}" class="rounded" />
+  </a>
+{% endif %}

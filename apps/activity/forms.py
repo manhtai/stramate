@@ -10,6 +10,7 @@ class ActivityForm(forms.ModelForm):
         widget=Textarea(attrs={'class': "form-control form-block"}),
     )
     initial_rotation = forms.IntegerField(
+        required=False,
         widget=NumberInput(attrs={'class': "form-control form-block"}),
     )
 
