@@ -10,10 +10,10 @@
         {{ activity.start_date|naturalday|title }} at
         {{ activity.start_date|date:"P" }}
       {% endtimezone %}
-      {% if activity.start_location %} &middot;{{ activity.start_location }}{% endif %}
+      {% if activity.start_location %} &middot; {{ activity.start_location }}{% endif %}
     </p>
     {% if request.user == activity.user %}
-      <a href="{% url "activity:detail" activity.id %}"
+      <a href="{% url "activity:edit" activity.id %}"
          class="opacity-50 text-link"
          title="Edit this activity">
         {% heroicon_outline "pencil-alt" class="w-4 h-4" %}
