@@ -2,6 +2,10 @@
 
 > A self-hosted data analyzer for your Strava activities
 
+## Notice
+
+You should host it yourself, don't give your data to arbitrary people on the internet!
+
 ## Local setup
 
 ```sh
