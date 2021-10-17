@@ -86,6 +86,7 @@ class Activity(models.Model):
             "user_id": user_id,
             "detail": detail_dict,
             "streams": streams_dict,
+            "analytics": dict(),
         }
 
         act, _ = Activity.objects.update_or_create(
