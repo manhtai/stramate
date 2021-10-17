@@ -86,6 +86,7 @@ class Activity(models.Model):
             "user_id": user_id,
             "detail": detail_dict,
             "streams": streams_dict,
+            "analytics": dict(),
         }
 
         act, _ = Activity.objects.update_or_create(
@@ -129,6 +130,14 @@ class Activity(models.Model):
             return [[b, a] for (a, b) in polyline.decode(self.polyline)]
 
         return []
+
+    @property
+    def calories(self):
+        return f"{self.detail.get('calories', 0):.0f} Cal"
+
+    @property
+    def average_hr(self):
+        return f"{self.detail.get('average_heartrate', 0):.0f} bpm"
 
     @classmethod
     def get_last_year_stats(cls, user_id):
