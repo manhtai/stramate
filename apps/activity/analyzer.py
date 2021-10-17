@@ -25,7 +25,7 @@ class PointAnalyzer():
 
         return {
             "min_hr": self.min_hr,
-            "max_hr": self.min_hr,
+            "max_hr": self.max_hr,
             "hrss": self.hrss,
         }
 

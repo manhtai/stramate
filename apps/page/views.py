@@ -34,7 +34,7 @@ class ProfileView(TemplateView):
 
         user_activities = Activity.objects.filter(
             user_id=user.id
-        ).order_by('-id')
+        ).order_by('-start_date')
 
         context.update(stats)
         context["username"] = user.username

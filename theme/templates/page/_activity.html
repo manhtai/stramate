@@ -10,7 +10,7 @@
         {{ activity.start_date|naturalday|title }} at
         {{ activity.start_date|date:"P" }}
       {% endtimezone %}
-      &middot; {% firstof activity.start_location "Somewhere" %}
+      {% if activity.start_location %} &middot;{{ activity.start_location }}{% endif %}
     </p>
     {% if request.user == activity.user %}
       <a href="{% url "activity:detail" activity.id %}"
@@ -36,8 +36,13 @@
   </h3>
   <section class="flex items-start justify-start">
     <section class="pr-4 border-r">
-      <h4 class="text-xs">Distance</h4>
-      <p class="text-base">{{ activity.format_distance }}</p>
+      {% if activity.distance %}
+        <h4 class="text-xs">Distance</h4>
+        <p class="text-base">{{ activity.format_distance }}</p>
+      {% else %}
+        <h4 class="text-xs">Cal</h4>
+        <p class="text-base">{{ activity.calories|intcomma }}</p>
+      {% endif %}
     </section>
     <section class="px-4 border-r">
       {% if activity.type == "Ride" %}
@@ -46,9 +51,12 @@
       {% elif activity.type == "Run" %}
         <h4 class="text-xs">Pace</h4>
         <p class="text-base">{{ activity.format_pace }}</p>
-      {% else %}
+      {% elif activity.distance %}
         <h4 class="text-xs">Speed</h4>
         <p class="text-base">{{ activity.format_speed }}</p>
+      {% else %}
+        <h4 class="text-xs">Avg. HR</h4>
+        <p class="text-base">{{ activity.average_hr }}</p>
       {% endif %}
     </section>
     <section class="px-4">

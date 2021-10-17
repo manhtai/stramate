@@ -131,6 +131,14 @@ class Activity(models.Model):
 
         return []
 
+    @property
+    def calories(self):
+        return f"{self.detail.get('calories', 0):.0f} Cal"
+
+    @property
+    def average_hr(self):
+        return f"{self.detail.get('average_heartrate', 0):.0f} bpm"
+
     @classmethod
     def get_last_year_stats(cls, user_id):
         all_time_total = Activity.objects.filter(user_id=user_id).count()
