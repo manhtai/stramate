@@ -1,0 +1,108 @@
+{% load tz %}
+{% load humanize %}
+{% load heroicons %}
+
+<li class="relative px-4 py-6 bg-white border rounded bg-gray-50 space-y-4">
+  {% if activity.start_location %}
+      {% include "activity/_activity_map.html" %}
+  {% endif %}
+
+  <section class="flex items-center justify-between space-x-2">
+    {% include "activity/_activity_date.html" %}
+    <a href="{% url "activity:edit" activity.id %}"
+       class="opacity-50 text-link"
+       title="Edit this activity">
+      {% heroicon_outline "pencil-alt" class="w-4 h-4" %}
+    </a>
+  </section>
+
+  <section class="flex flex-col items-start justify-around space-y-10">
+    <section class="flex flex-col flex-1 space-y-4">
+      <h3 class="text-xl font-bold">
+        Metrics
+      </h3>
+
+      <section class="flex items-start justify-start">
+        <section class="pr-4 border-r">
+          <h4 class="text-xs">Calories</h4>
+          <p class="text-base">{{ activity.calories|intcomma }}</p>
+        </section>
+        <section class="px-4 border-r">
+          <h4 class="text-xs">Time</h4>
+          <p class="text-base">{{ activity.total_moving_time }}</p>
+        </section>
+        <section class="px-4 border-r">
+          <h4 class="text-xs">Avg. HR</h4>
+          <p class="text-base">{{ activity.average_hr }}</p>
+        </section>
+        <section class="px-4">
+          <h4 class="text-xs">Max HR</h4>
+          <p class="text-base">{{ activity.max_hr }}</p>
+        </section>
+      </section>
+
+      {% if activity.distance %}
+      <section class="flex items-start justify-start">
+        <section class="pr-4 border-r">
+          <h4 class="text-xs">Distance</h4>
+          <p class="text-base">{{ activity.total_distance }}</p>
+        </section>
+
+        <section class="px-4 border-r">
+          <h4 class="text-xs">Elev. gain</h4>
+          <p class="text-base">{{ activity.total_elev }}</p>
+        </section>
+
+        {% if activity.type == "Run" %}
+          <section class="px-4 border-r">
+            <h4 class="text-xs">Pace</h4>
+            <p class="text-base">{{ activity.avg_pace }}</p>
+          </section>
+          <section class="px-4">
+            <h4 class="text-xs">Max pace</h4>
+            <p class="text-base">{{ activity.max_pace }}</p>
+          </section>
+        {% elif activity.type == "Swim" %}
+          <section class="px-4 border-r">
+            <h4 class="text-xs">Avg. speed</h4>
+            <p class="text-base">{{ activity.avg_speed_mps }}</p>
+          </section>
+          <section class="px-4">
+            <h4 class="text-xs">Max speed</h4>
+            <p class="text-base">{{ activity.max_speed_mps }}</p>
+          </section>
+        {% else %}
+          <section class="px-4 border-r">
+            <h4 class="text-xs">Avg. speed</h4>
+            <p class="text-base">{{ activity.avg_speed_kph }}</p>
+          </section>
+          <section class="px-4">
+            <h4 class="text-xs">Max speed</h4>
+            <p class="text-base">{{ activity.max_speed_kph }}</p>
+          </section>
+        {% endif %}
+      </section>
+      {% endif %}
+    </section>
+
+    {% if activity.max_hr %}
+      <section class="flex flex-col space-y-4">
+        <h3 class="text-xl font-bold">
+          Heart rate zones
+        </h3>
+        <section>
+          {% include "activity/_activity_heart.html" %}
+        </section>
+      </section>
+
+      <section class="flex flex-col space-y-4">
+        <h3 class="text-xl font-bold">
+          Stress score
+        </h3>
+        <section>
+          <p class="text-lg">{{ activity.stress_score }}<p>
+        </section>
+      </section>
+    {% endif %}
+  </section>
+<li>

@@ -7,11 +7,11 @@
     type: 'doughnut',
     options: {
       plugins: {
-        legend: true,
+        legend: false,
         tooltip: {
           callbacks: {
             label(context) {
-                return data[context.dataIndex].timef;
+                return ' ' + data[context.dataIndex].zonef + ': ' + data[context.dataIndex].timef;
             },
           },
         },

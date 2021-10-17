@@ -9,7 +9,7 @@ from apps.activity.models import Activity
 
 
 class RouteView(TemplateView):
-    template_name = "page/map.html"
+    template_name = "activity/route.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

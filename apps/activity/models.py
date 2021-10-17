@@ -1,7 +1,7 @@
+from collections import defaultdict
 from datetime import datetime, timedelta
 from os import path
 from urllib.parse import quote_plus
-from collections import defaultdict
 
 import polyline
 import pytz
@@ -14,6 +14,7 @@ from django.db import models
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
 from django.urls import reverse_lazy
+from django.utils.functional import cached_property
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -26,8 +27,6 @@ FIELD_DEFAULTS = {
     "average_speed": 0,
     "timezone": "UTC",
 }
-
-HEART_RATE_ZONES = [.6, .7, .8, .9]
 
 
 class Analytic(models.Model):
@@ -55,7 +54,7 @@ class Activity(models.Model):
 
     distance = models.FloatField()  # m
     moving_time = models.PositiveIntegerField()  # s
-    total_elevation_gain = models.FloatField()  # s
+    total_elevation_gain = models.FloatField()  # m
     average_speed = models.FloatField()  # m/s
 
     start_date = models.DateTimeField()
@@ -198,35 +197,53 @@ class Activity(models.Model):
             "last_year_moving": last_year_moving,
         }
 
-    @property
+    @cached_property
     def polyline(self):
         return self.detail.get("map") and self.detail["map"].get("polyline")
 
     @property
-    def format_distance(self):
+    def total_distance(self):
         if self.distance > 1_000:
             return f"{self.distance/1_000:.2f} km"
         return f"{self.distance} m"
 
     @property
-    def format_elev(self):
+    def total_elev(self):
         if self.total_elevation_gain > 1_000:
             return f"{self.total_elevation_gain/1_000:.2f} km"
         return f"{self.total_elevation_gain:.0f} m"
 
     @property
-    def format_pace(self):
+    def avg_pace(self):
         pace = 1_000 / self.average_speed
         [d, h, m, s] = self._get_units(pace)
         return f"{m}:{s:02} /km"
 
     @property
-    def format_speed_mps(self):
+    def max_pace(self):
+        pace = 1_000 / self.max_speed
+        [d, h, m, s] = self._get_units(pace)
+        return f"{m}:{s:02} /km"
+
+    @property
+    def avg_speed_mps(self):
         return f"{self.average_speed:.1f} m/s"
 
     @property
-    def format_speed_kph(self):
+    def avg_speed_kph(self):
         return f"{self.average_speed * 3.6:.1f} km/h"
+
+    @property
+    def max_speed_mps(self):
+        return f"{self.max_speed:.1f} m/s"
+
+    @property
+    def max_speed_kph(self):
+        return f"{self.max_speed * 3.6:.1f} km/h"
+
+    @cached_property
+    def max_speed(self):
+        return self.detail.get("max_speed", 0)
 
     @staticmethod
     def format_time(seconds):
@@ -246,35 +263,25 @@ class Activity(models.Model):
         return fdiff
 
     @property
-    def format_moving_time(self):
+    def total_moving_time(self):
         return self.format_time(self.moving_time)
 
     @property
     def heart_rate_zones(self):
-        max_hr = self.analytics.get("max_hr")
-        min_hr = self.analytics.get("min_hr")
-        if not max_hr or not min_hr:
-            return {}
+        hr_zones = self.analytics.get("hr_zones")
+        if not hr_zones:
+            return []
 
-        hrr = max_hr - min_hr
-        z1 = round((hrr * HEART_RATE_ZONES[0]) + min_hr)
-        z2 = round((hrr * HEART_RATE_ZONES[1]) + min_hr)
-        z3 = round((hrr * HEART_RATE_ZONES[2]) + min_hr)
-        z4 = round((hrr * HEART_RATE_ZONES[3]) + min_hr)
+        zones = defaultdict(int)
+        for z in hr_zones:
+            zones[z] += 1
 
-        heart_rates = self.streams['heartrate']['data']
-
-        zones = defaultdict(list)
-        for z in map(lambda hr: self.hr_zone(hr, z1, z2, z3, z4), heart_rates):
-            zones[z].append(1)
-
-        seconds = {k: sum(v) for k, v in zones.items()}
         return [
             {
                 "zone": i,
                 "zonef": f"Zone {i}",
-                "time": seconds.get(i, 0),
-                "timef": self.format_time(seconds.get(i, 0)),
+                "time": zones[i],
+                "timef": self.format_time(zones[i]),
             }
             for i in [1, 2, 3, 4, 5]
         ]
@@ -283,27 +290,8 @@ class Activity(models.Model):
     def stress_score(self):
         hrss = self.analytics.get("hrss")
         if hrss:
-            return f"{hrss:.0f}"
+            return f"{hrss:.1f}"
         return "N/A"
-
-    @staticmethod
-    def hr_zone(heartrate, z1, z2, z3, z4):
-        if not heartrate:
-            return None
-
-        if heartrate <= z1:
-            return 1
-
-        if heartrate <= z2:
-            return 2
-
-        if heartrate <= z3:
-            return 3
-
-        if heartrate <= z4:
-            return 4
-
-        return 5
 
     @staticmethod
     def _get_units(diff):
