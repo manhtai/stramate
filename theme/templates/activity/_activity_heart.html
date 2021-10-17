@@ -1,0 +1,36 @@
+<canvas style="" id="heart"></canvas>
+
+<script src="//cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+<script>
+  const data = {{ activity.heart_rate_zones|safe }};
+  const config = {
+    type: 'doughnut',
+    options: {
+      plugins: {
+        legend: false,
+        tooltip: {
+          callbacks: {
+            label(context) {
+                return ' ' + data[context.dataIndex].zonef + ': ' + data[context.dataIndex].timef;
+            },
+          },
+        },
+      },
+    },
+    data: {
+      datasets: [{
+        data: data.map(d => d.time),
+        backgroundColor: [
+          'rgb(254, 202, 202)',
+          'rgb(252, 165, 165)',
+          'rgb(248, 113, 113)',
+          'rgb(239, 68, 68)',
+          'rgb(220, 38, 38)',
+        ],
+      }],
+      labels: data.map(d => d.zonef),
+    },
+  };
+  var ctx = document.getElementById('heart').getContext('2d');
+  var chart = new Chart(ctx, config);
+</script>

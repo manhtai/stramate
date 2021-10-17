@@ -7,41 +7,13 @@
 {% block main %}
   <section class="flex items-center justify-start my-10 space-x-2">
     <h1 class="text-4xl font-bold">
-        {{ activity.name }}
+        {{ activity.type }}: {{ activity.name }}
     </h1>
   </section>
 
   <section class="mb-8 space-y-2">
-    <section class="flex items-center justify-between space-x-4">
-      <h2 class="text-lg font-medium opacity-50">
-        Configure activity display
-      </h2>
-    </section>
-    <form method="post" class="p-4 mt-8 border rounded space-y-6">
-        {{ form.non_field_errors }}
-        <div>
-            <label for="{{ form.name.id_for_label }}">Name:</label>
-            {{ form.name }}
-            {{ form.name.errors }}
-        </div>
-        <div>
-            <label for="{{ form.description.id_for_label }}">Description:</label>
-            {{ form.description }}
-            {{ form.description.errors }}
-        </div>
-        <div>
-            <label for="{{ form.initial_rotation.id_for_label }}">Initial map rotation:</label>
-            {{ form.initial_rotation }}
-            {{ form.initial_rotation.errors }}
-        </div>
-
-        <div class="space-x-2">
-          <input type="submit" value="Update" class="btn btn-primary">
-          <a href="{% url "page:profile" request.user.username %}" class="btn btn-outline">
-            Cancel
-          </a>
-        </div>
-        {% csrf_token %}
-    </form>
+    <ul class="space-y-4">
+      {% include "activity/_activity_detail.html" %}
+    </ul>
   </section>
 {% endblock %}

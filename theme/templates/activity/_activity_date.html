@@ -1,0 +1,11 @@
+{% load tz %}
+{% load heroicons %}
+{% load humanize %}
+
+<p class="text-xs">
+  {% timezone activity.timezone %}
+    {{ activity.start_date|naturalday|title }} at
+    {{ activity.start_date|date:"P" }}
+  {% endtimezone %}
+  {% if activity.start_location %} &middot; {{ activity.start_location }}{% endif %}
+</p>

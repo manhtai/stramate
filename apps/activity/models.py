@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, timedelta
 from os import path
 from urllib.parse import quote_plus
@@ -13,6 +14,7 @@ from django.db import models
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
 from django.urls import reverse_lazy
+from django.utils.functional import cached_property
 
 FIELD_DEFAULTS = {
     "id": 0,
@@ -52,7 +54,7 @@ class Activity(models.Model):
 
     distance = models.FloatField()  # m
     moving_time = models.PositiveIntegerField()  # s
-    total_elevation_gain = models.FloatField()  # s
+    total_elevation_gain = models.FloatField()  # m
     average_speed = models.FloatField()  # m/s
 
     start_date = models.DateTimeField()
@@ -137,7 +139,17 @@ class Activity(models.Model):
 
     @property
     def average_hr(self):
-        return f"{self.detail.get('average_heartrate', 0):.0f} bpm"
+        hr = self.detail.get('average_heartrate', 0)
+        if hr:
+            return f"{hr:.0f} bpm"
+        return ""
+
+    @property
+    def max_hr(self):
+        hr = self.detail.get('max_heartrate', 0)
+        if hr:
+            return f"{hr:.0f} bpm"
+        return ''
 
     @classmethod
     def get_last_year_stats(cls, user_id):
@@ -185,31 +197,53 @@ class Activity(models.Model):
             "last_year_moving": last_year_moving,
         }
 
-    @property
+    @cached_property
     def polyline(self):
         return self.detail.get("map") and self.detail["map"].get("polyline")
 
     @property
-    def format_distance(self):
+    def total_distance(self):
         if self.distance > 1_000:
             return f"{self.distance/1_000:.2f} km"
         return f"{self.distance} m"
 
     @property
-    def format_elev(self):
+    def total_elev(self):
         if self.total_elevation_gain > 1_000:
             return f"{self.total_elevation_gain/1_000:.2f} km"
         return f"{self.total_elevation_gain:.0f} m"
 
     @property
-    def format_pace(self):
+    def avg_pace(self):
         pace = 1_000 / self.average_speed
         [d, h, m, s] = self._get_units(pace)
         return f"{m}:{s:02} /km"
 
     @property
-    def format_speed(self):
+    def max_pace(self):
+        pace = 1_000 / self.max_speed
+        [d, h, m, s] = self._get_units(pace)
+        return f"{m}:{s:02} /km"
+
+    @property
+    def avg_speed_mps(self):
         return f"{self.average_speed:.1f} m/s"
+
+    @property
+    def avg_speed_kph(self):
+        return f"{self.average_speed * 3.6:.1f} km/h"
+
+    @property
+    def max_speed_mps(self):
+        return f"{self.max_speed:.1f} m/s"
+
+    @property
+    def max_speed_kph(self):
+        return f"{self.max_speed * 3.6:.1f} km/h"
+
+    @cached_property
+    def max_speed(self):
+        return self.detail.get("max_speed", 0)
 
     @staticmethod
     def format_time(seconds):
@@ -229,8 +263,35 @@ class Activity(models.Model):
         return fdiff
 
     @property
-    def format_moving_time(self):
+    def total_moving_time(self):
         return self.format_time(self.moving_time)
+
+    @property
+    def heart_rate_zones(self):
+        hr_zones = self.analytics.get("hr_zones")
+        if not hr_zones:
+            return []
+
+        zones = defaultdict(int)
+        for z in hr_zones:
+            zones[z] += 1
+
+        return [
+            {
+                "zone": i,
+                "zonef": f"Zone {i}",
+                "time": zones[i],
+                "timef": self.format_time(zones[i]),
+            }
+            for i in [1, 2, 3, 4, 5]
+        ]
+
+    @property
+    def stress_score(self):
+        hrss = self.analytics.get("hrss")
+        if hrss:
+            return f"{hrss:.1f}"
+        return "N/A"
 
     @staticmethod
     def _get_units(diff):
