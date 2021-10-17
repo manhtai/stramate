@@ -17,66 +17,66 @@
   </section>
 
   <section class="flex flex-col items-start justify-around space-y-10">
-    <section class="flex flex-col flex-1 space-y-4">
+    <section class="flex flex-col space-y-4">
       <h3 class="text-xl font-bold">
         Metrics
       </h3>
 
-      <section class="flex items-start justify-start">
-        <section class="pr-4 border-r">
-          <h4 class="text-xs">Calories</h4>
-          <p class="text-base">{{ activity.calories|intcomma }}</p>
-        </section>
-        <section class="px-4 border-r">
+      <section class="flex flex-wrap items-start justify-start">
+        <section class="pr-8 mb-4">
           <h4 class="text-xs">Time</h4>
           <p class="text-base">{{ activity.total_moving_time }}</p>
         </section>
-        <section class="px-4 border-r">
+        <section class="pr-8 mb-4">
+          <h4 class="text-xs">Calories</h4>
+          <p class="text-base">{{ activity.calories|intcomma }}</p>
+        </section>
+        <section class="pr-8 mb-4">
           <h4 class="text-xs">Avg. HR</h4>
           <p class="text-base">{{ activity.average_hr }}</p>
         </section>
-        <section class="px-4">
+        <section class="pr-8 mb-4">
           <h4 class="text-xs">Max HR</h4>
           <p class="text-base">{{ activity.max_hr }}</p>
         </section>
       </section>
 
       {% if activity.distance %}
-      <section class="flex items-start justify-start">
-        <section class="pr-4 border-r">
+      <section class="flex flex-wrap items-start justify-start">
+        <section class="pr-8 mb-4">
           <h4 class="text-xs">Distance</h4>
           <p class="text-base">{{ activity.total_distance }}</p>
         </section>
 
-        <section class="px-4 border-r">
+        <section class="pr-8 mb-4">
           <h4 class="text-xs">Elev. gain</h4>
           <p class="text-base">{{ activity.total_elev }}</p>
         </section>
 
         {% if activity.type == "Run" %}
-          <section class="px-4 border-r">
-            <h4 class="text-xs">Pace</h4>
+          <section class="pr-8 mb-4">
+            <h4 class="text-xs">Avg. pace</h4>
             <p class="text-base">{{ activity.avg_pace }}</p>
           </section>
-          <section class="px-4">
+          <section class="pr-8 mb-4">
             <h4 class="text-xs">Max pace</h4>
             <p class="text-base">{{ activity.max_pace }}</p>
           </section>
         {% elif activity.type == "Swim" %}
-          <section class="px-4 border-r">
+          <section class="pr-8 mb-4">
             <h4 class="text-xs">Avg. speed</h4>
             <p class="text-base">{{ activity.avg_speed_mps }}</p>
           </section>
-          <section class="px-4">
+          <section class="pr-8 mb-4">
             <h4 class="text-xs">Max speed</h4>
             <p class="text-base">{{ activity.max_speed_mps }}</p>
           </section>
         {% else %}
-          <section class="px-4 border-r">
+          <section class="pr-8 mb-4">
             <h4 class="text-xs">Avg. speed</h4>
             <p class="text-base">{{ activity.avg_speed_kph }}</p>
           </section>
-          <section class="px-4">
+          <section class="pr-8 mb-4">
             <h4 class="text-xs">Max speed</h4>
             <p class="text-base">{{ activity.max_speed_kph }}</p>
           </section>
