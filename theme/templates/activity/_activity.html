@@ -3,7 +3,7 @@
 {% load static %}
 
 <li class="relative px-4 py-6 bg-white border rounded bg-gray-50 space-y-4">
-  <section class="flex items-center justify-between space-x-2">
+  <section class="flex items-start justify-between space-x-2">
     {% include "activity/_activity_date.html" %}
     {% if request.user == activity.user %}
       <a href="{% url "activity:detail" activity.id %}"
@@ -54,7 +54,7 @@
       {% elif activity.distance %}
         <h4 class="text-xs">Speed</h4>
         <p class="text-base">{{ activity.avg_speed_kph }}</p>
-      {% else %}
+      {% elif activity.max_hr %}
         <h4 class="text-xs">Avg. HR</h4>
         <p class="text-base">{{ activity.average_hr }}</p>
       {% endif %}

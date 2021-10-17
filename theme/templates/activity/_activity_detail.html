@@ -7,7 +7,7 @@
       {% include "activity/_activity_map.html" %}
   {% endif %}
 
-  <section class="flex items-center justify-between space-x-2">
+  <section class="flex items-start justify-between space-x-2">
     {% include "activity/_activity_date.html" %}
     <a href="{% url "activity:edit" activity.id %}"
        class="opacity-50 text-link"
@@ -31,6 +31,7 @@
           <h4 class="text-xs">Calories</h4>
           <p class="text-base">{{ activity.calories|intcomma }}</p>
         </section>
+        {% if activity.max_hr %}
         <section class="pr-8 mb-4">
           <h4 class="text-xs">Avg. HR</h4>
           <p class="text-base">{{ activity.average_hr }}</p>
@@ -39,6 +40,7 @@
           <h4 class="text-xs">Max HR</h4>
           <p class="text-base">{{ activity.max_hr }}</p>
         </section>
+        {% endif %}
       </section>
 
       {% if activity.distance %}
