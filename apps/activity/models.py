@@ -135,7 +135,7 @@ class Activity(models.Model):
 
     @property
     def calories(self):
-        return f"{self.detail.get('calories', 0):.0f} Cal"
+        return f"{self.detail.get('calories', 0):,.0f} Cal"
 
     @property
     def average_hr(self):
