@@ -9,11 +9,13 @@
 
   <section class="flex items-start justify-between space-x-2">
     {% include "activity/_activity_date.html" %}
+    {% if request.user == activity.user %}
     <a href="{% url "activity:edit" activity.id %}"
        class="opacity-50 text-link"
        title="Edit this activity">
       {% heroicon_outline "pencil-alt" class="w-4 h-4" %}
     </a>
+    {% endif %}
   </section>
 
   <section class="flex flex-col items-start justify-around space-y-10">
