@@ -9,8 +9,21 @@ You should host it yourself, don't give your data to arbitrary people on the int
 ## Local setup
 
 ```sh
+# install dependencies
 poetry install
 poetry run python manage.py migrate
+
+# build assets
+poetry run python manage.py tailwind install
+poetry run python manage.py tailwind build
+
+# update .env (get your own credentials from https://www.strava.com/settings/api)
+PYTHONUNBUFFERED=true
+STRAVA_CLIENT_ID=xxx
+STRAVA_CLIENT_SECRET=xxx
+MAPBOX_ACCESS_TOKEN=xxx
+
+# run dev server
 poetry run honcho start
 ```
 
