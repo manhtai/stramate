@@ -3,13 +3,16 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <title>StraMate</title>
+      <title>{{ activity.type }}: {{ activity.name }} &middot; {{ activity.user.username }} &middot; StraMate</title>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <link rel="icon" href={% static "img/s64.png" %} />
       <link rel="apple-touch-icon" href={% static "img/s192.png" %} />
       <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet">
+
+      <meta name="description" content="A self-hosted data analyzer for your activities">
+      <meta property="og:image" content="{% if activity.start_location %}https://{{ request.get_host }}{% get_media_prefix %}{{ activity.map }}{% endif %}" />
 
       {% tailwind_css %}
   </head>
