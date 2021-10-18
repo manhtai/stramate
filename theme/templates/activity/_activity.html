@@ -5,13 +5,11 @@
 <li class="relative px-4 py-6 bg-white border rounded bg-gray-50 space-y-4">
   <section class="flex items-start justify-between space-x-2">
     {% include "activity/_activity_date.html" %}
-    {% if request.user == activity.user %}
-      <a href="{% url "activity:detail" activity.id %}"
-         class="opacity-50 text-link"
-         title="View this activity">
-        {% heroicon_outline "chart-pie" class="w-4 h-4" %}
-      </a>
-    {% endif %}
+    <a href="{% url "activity:detail" activity.id %}"
+       class="opacity-50 text-link"
+       title="View this activity">
+      {% heroicon_outline "chart-pie" class="w-4 h-4" %}
+    </a>
   </section>
   <h3 class="flex items-center text-xl font-bold justify-stretch space-x-3">
     <span class="flex-shrink-0">

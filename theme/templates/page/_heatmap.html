@@ -15,7 +15,10 @@
 
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
-    <h2 class="text-lg font-medium">Performance over the year</h2>
+    <h2 class="text-lg font-medium">Training load over the year</h2>
+    <a href="https://github.com/manhtai/stramate/wiki/Training-load:-Fitness-&-Fatigue" class="opacity-50 text-link" title="Fitness and fatigue" target="new">
+      {% heroicon_outline "information-circle" class="w-4 h-4" %}
+    </a>
   </section>
 
   <section class="flex items-center justify-end px-4 overflow-hidden bg-white border rounded">
@@ -186,6 +189,10 @@
 
   // ==================== Fitness start ====================
   const ftData = {{ fitness|safe }};
+  const ctlData = ftData.map(d => d.ctl.toFixed(0));
+  const atlData = ftData.map(d => d.atl.toFixed(0));
+  const suggestedMax = Math.max(Math.max(...ctlData), Math.max(...atlData));
+
   const ftConfig = {
     type: 'line',
     data: {
@@ -193,7 +200,7 @@
       datasets: [
         {
           label: "Fitness",
-          data: ftData.map(d => d.ctl.toFixed(0)),
+          data: ctlData,
           yAxisID: 'ctl',
           borderColor: bdColors[2],
           backgroundColor: bgColors[2],
@@ -202,7 +209,7 @@
         },
         {
           label: "Fatigue",
-          data: ftData.map(d => d.atl.toFixed(0)),
+          data: atlData,
           yAxisID: 'atl',
           borderColor: bdColors[0],
           backgroundColor: bgColors[0],
@@ -250,17 +257,19 @@
           position: 'left',
           grid: {
             display: true,
+            drawBorder: false,
           },
+          suggestedMax,
         },
         atl: {
           offset: true,
-          display: false,
+          display: true,
           position: 'right',
           grid: {
-            display: false,
             drawBorder: false,
             tickLength: 0,
           },
+          suggestedMax,
         },
       },
       layout: {

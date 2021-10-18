@@ -26,12 +26,6 @@ class DetailView(LoginRequiredMixin, DetailView):
     pk_url_kwarg = "activity_id"
     template_name = "activity/detail.html"
 
-    def get_object(self, **kwargs):
-        obj = super().get_object(**kwargs)
-        if obj.user != self.request.user:
-            raise Http404()
-        return obj
-
 
 class EditView(LoginRequiredMixin, UpdateView):
     model = Activity
