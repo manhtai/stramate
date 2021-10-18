@@ -1,13 +1,14 @@
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import TemplateView, View
 from django.core.paginator import Paginator
-
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView, View
+
 from apps.activity.models import Activity, Analytic
 
-
-PAGE_SIZE = 3
+GUEST_PAGE_SIZE = 3
+OWNER_PAGE_SIZE = 10
 
 
 class IndexView(View):
@@ -40,12 +41,18 @@ class ProfileView(TemplateView):
         context["username"] = user.username
 
         if self.request.user.is_authenticated and self.request.user == user:
+            q = self.request.GET.get('q')
+            if q:
+                user_activities = user_activities.filter(
+                    Q(name__icontains=q) | Q(start_location__icontains=q)
+                )
+
             page_number = self.request.GET.get('page')
-            paginator = Paginator(user_activities, PAGE_SIZE)
+            paginator = Paginator(user_activities, OWNER_PAGE_SIZE)
             page_obj = paginator.get_page(page_number)
 
             context["page_obj"] = page_obj
         else:
-            context["page_obj"] = user_activities[:PAGE_SIZE]
+            context["page_obj"] = user_activities[:GUEST_PAGE_SIZE]
 
         return context
