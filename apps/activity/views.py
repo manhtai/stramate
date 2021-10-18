@@ -21,7 +21,7 @@ class RouteView(TemplateView):
         return context
 
 
-class DetailView(LoginRequiredMixin, DetailView):
+class DetailView(DetailView):
     model = Activity
     pk_url_kwarg = "activity_id"
     template_name = "activity/detail.html"
