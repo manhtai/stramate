@@ -28,7 +28,7 @@ class Athlete(models.Model):
         return ath
 
     def get_absolute_url(self):
-        return reverse_lazy("account:athlete")
+        return reverse_lazy("page:profile", args=(self.user.username,))
 
     def __str__(self):
         return f"Athlete #{self.id}: #{self.user.username}"

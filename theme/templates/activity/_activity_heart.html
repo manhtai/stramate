@@ -7,7 +7,9 @@
     type: 'doughnut',
     options: {
       plugins: {
-        legend: false,
+        legend: {
+            position: 'bottom',
+        },
         tooltip: {
           callbacks: {
             label(context) {
@@ -21,11 +23,11 @@
       datasets: [{
         data: data.map(d => d.time),
         backgroundColor: [
-          'rgb(254, 202, 202)',
-          'rgb(252, 165, 165)',
-          'rgb(248, 113, 113)',
-          'rgb(239, 68, 68)',
-          'rgb(220, 38, 38)',
+          'rgb(229, 231, 235)',
+          'rgb(147, 197, 253)',
+          'rgb(52, 211, 153)',
+          'rgb(245, 158, 11)',
+          'rgb(219, 39, 119)',
         ],
       }],
       labels: data.map(d => d.zonef),

@@ -9,7 +9,7 @@ class AthleteForm(forms.ModelForm):
 
     sex = forms.ChoiceField(
         widget=Select(attrs={'class': "form-control form-block"}),
-        choices=(("", "Other"), ("M", "Male"), ("F", "Female")),
+        choices=(("O", "Other"), ("M", "Male"), ("F", "Female")),
     )
     resting_hr = forms.IntegerField(widget=NumberInput(attrs={'class': "form-control form-block"}))
 
