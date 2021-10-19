@@ -34,11 +34,11 @@
     {% if page_obj.number %}
       {% if page_obj.has_previous %}
         {% if page_obj.previous_page_number != 1 %}
-          <a href="?page=1" class="pagination__nav">
+          <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination__nav">
             {% heroicon_outline "chevron-double-left" class="w-6 h-6" %}
           </a>
         {% endif %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="pagination__nav">
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination__nav">
           {% heroicon_outline "chevron-left" class="w-6 h-6" %}
         </a>
       {% endif %}
@@ -48,12 +48,12 @@
       </span>
 
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="pagination__nav">
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination__nav">
           {% heroicon_outline "chevron-right" class="w-6 h-6" %}
         </a>
 
         {% if page_obj.next_page_number != page_obj.paginator.num_pages %}
-          <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination__nav">
+          <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination__nav">
             {% heroicon_outline "chevron-double-right" class="w-6 h-6" %}
           </a>
         {% endif %}
