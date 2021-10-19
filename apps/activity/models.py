@@ -252,20 +252,22 @@ class Activity(models.Model):
 
     @staticmethod
     def format_time(seconds):
+        fdiff = ''
         [d, h, m, s] = Activity._get_units(seconds)
 
         if d > 0:
-            fdiff = f'{d}d {h}h {m}m'
-        elif h > 0:
-            fdiff = f'{h}h {m}m'
-        elif m > 0:
-            fdiff = f'{m}m {s}s'
-        elif s > 0:
-            fdiff = f'{s}s'
-        else:
-            fdiff = ''
+            fdiff += f'{d}d'
 
-        return fdiff
+        if h > 0:
+            fdiff += f' {h}h'
+
+        if m > 0:
+            fdiff += f' {m}m'
+
+        if s > 0:
+            fdiff += f' {s}s'
+
+        return fdiff.strip()
 
     @property
     def total_moving_time(self):
