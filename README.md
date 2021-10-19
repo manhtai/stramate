@@ -34,22 +34,9 @@ MAPBOX_ACCESS_TOKEN=pk.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 3. Install dependencies and start server
 
 ```sh
-# install dependencies
 poetry install
 poetry run python manage.py tailwind install
 poetry run python manage.py migrate
-
-# build assets
-poetry run python manage.py tailwind install
-poetry run python manage.py tailwind build
-
-# update .env (get your own credentials from https://www.strava.com/settings/api)
-PYTHONUNBUFFERED=true
-STRAVA_CLIENT_ID=xxx
-STRAVA_CLIENT_SECRET=xxx
-MAPBOX_ACCESS_TOKEN=xxx
-
-# run dev server
 poetry run honcho start
 ```
 
