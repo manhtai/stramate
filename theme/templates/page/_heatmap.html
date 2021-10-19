@@ -6,7 +6,7 @@
     <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
   </section>
 
-  <section class="flex items-center justify-end px-4 overflow-hidden border rounded bg-white">
+  <section class="flex items-center justify-end px-4 overflow-hidden bg-white border rounded">
     <section style="width: 718px; height: 143px;">
       <canvas id="heatmap" style="width: 718px; height: 143px;"></canvas>
     </section>
@@ -15,10 +15,13 @@
 
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
-    <h2 class="text-lg font-medium">Performance over the year</h2>
+    <h2 class="text-lg font-medium">Training load over the year</h2>
+    <a href="https://github.com/manhtai/stramate/wiki/Training-load:-Fitness-&-Fatigue" class="opacity-50 text-link" title="Fitness and fatigue" target="new">
+      {% heroicon_outline "information-circle" class="w-4 h-4" %}
+    </a>
   </section>
 
-  <section class="flex items-center justify-end px-4 overflow-hidden border rounded bg-white">
+  <section class="flex items-center justify-end px-4 overflow-hidden bg-white border rounded">
     <section style="width: 718px; height: 359px;">
       <canvas style="width: 718px; height: 359px;" id="fitness"></canvas>
     </section>
@@ -120,16 +123,28 @@
     }
   };
 
+
+  const bgColors = ['#ebedf0', '#9be98a', '#40c463', '#30a14e', '#216e39'];
+  const bdColors = ['#dee0e4', '#93dca0', '#3dba5f', '#30a14e', '#206938'];
+
+  const getColor = (v, maxV, colors) => {
+    const step = maxV / colors.length;
+    for (let i = 0; i < colors.length; i++) {
+        if (v <= i * step) {
+            return colors[i]
+        }
+    }
+    return colors[colors.length-1]
+  }
+
   const getBgColor = (c) => {
-      const value = c.dataset.data[c.dataIndex].v;
-      const alpha = value / 7200;
-      return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
+    const value = c.dataset.data[c.dataIndex].v;
+    return getColor(value, 7200, bgColors);
   }
 
   const getBorderColor = (c) => {
     const value = c.dataset.data[c.dataIndex].v;
-    const alpha = value / 7200;
-    return value ? `rgba(5, 150, 105, ${alpha})` : 'rgba(229, 231, 235, 1)';
+    return getColor(value, 7200, bdColors);
   }
 
   const data = {
@@ -174,6 +189,10 @@
 
   // ==================== Fitness start ====================
   const ftData = {{ fitness|safe }};
+  const ctlData = ftData.map(d => d.ctl.toFixed(0));
+  const atlData = ftData.map(d => d.atl.toFixed(0));
+  const suggestedMax = Math.max(Math.max(...ctlData), Math.max(...atlData));
+
   const ftConfig = {
     type: 'line',
     data: {
@@ -181,18 +200,20 @@
       datasets: [
         {
           label: "Fitness",
-          data: ftData.map(d => d.ctl.toFixed(0)),
+          data: ctlData,
           yAxisID: 'ctl',
-          borderColor: "rgba(5, 150, 105, 0.8)",
-          backgroundColor: "rgba(5, 150, 105, 0.5)",
+          borderColor: bdColors[2],
+          backgroundColor: bgColors[2],
+          borderWidth: 2,
           pointRadius: 0,
         },
         {
           label: "Fatigue",
-          data: ftData.map(d => d.atl.toFixed(0)),
+          data: atlData,
           yAxisID: 'atl',
-          borderColor: "rgba(209, 213, 219, 0.8)",
-          backgroundColor: "rgba(209, 213, 219, 0.5)",
+          borderColor: bdColors[0],
+          backgroundColor: bgColors[0],
+          borderWidth: 2,
           pointRadius: 0,
         },
       ]
@@ -236,17 +257,19 @@
           position: 'left',
           grid: {
             display: true,
+            drawBorder: false,
           },
+          suggestedMax,
         },
         atl: {
           offset: true,
-          display: false,
+          display: true,
           position: 'right',
           grid: {
-            display: false,
             drawBorder: false,
             tickLength: 0,
           },
+          suggestedMax,
         },
       },
       layout: {

@@ -48,7 +48,7 @@ class Analytic(models.Model):
 class Activity(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
 
-    name = models.TextField(blank=True)
+    name = models.TextField(blank=True, db_index=True)
     type = models.TextField(blank=True)
     description = models.TextField(blank=True)
 
@@ -60,7 +60,7 @@ class Activity(models.Model):
     start_date = models.DateTimeField()
     timezone = models.TextField()
     start_date_local = models.DateTimeField()
-    start_location = models.TextField()  # place_name
+    start_location = models.TextField(blank=True, db_index=True)  # place_name
 
     initial_rotation = models.IntegerField(default=-10)
 
@@ -135,7 +135,7 @@ class Activity(models.Model):
 
     @property
     def calories(self):
-        return f"{self.detail.get('calories', 0):.0f} Cal"
+        return f"{self.detail.get('calories', 0):,.0f} Cal"
 
     @property
     def average_hr(self):

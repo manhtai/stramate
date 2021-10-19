@@ -3,6 +3,11 @@
 {% load heroicons %}
 {% load humanize %}
 {% load tz %}
+{% load static %}
+
+{% block title %}{{ activity.type }}: {{ activity.name }} &middot; {{ activity.user.username }}{% endblock %}
+
+{% block image %}{% if activity.start_location %}https://{{ request.get_host }}{% get_media_prefix %}{{ activity.map }}{% endif %}{% endblock %}
 
 {% block main %}
   <section class="flex items-center justify-start my-10 space-x-2">

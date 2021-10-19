@@ -5,7 +5,7 @@
 # sudo apt-get install -y nodejs
 # curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 # poetry install
-# poetry run python manage.py tailwind init
+# poetry run python manage.py tailwind install
 
 git pull
 poetry install
