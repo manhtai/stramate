@@ -167,10 +167,15 @@ class Activity(models.Model):
         today = datetime.now().astimezone(pytz.timezone(timezone))
 
         last_year_activities = user_activities \
+            .values('start_date_local') \
             .annotate(date=TruncDate('start_date_local')) \
             .values('date') \
-            .annotate(moving=Sum('moving_time'), count=Count('id')) \
-            .values('date', 'moving', 'count')
+            .annotate(
+                moving=Sum('moving_time'),
+                count=Count('id'),
+            ) \
+            .values('date', 'moving', 'count') \
+            .order_by('date')
 
         last_year_dict = {
             d['date']: d['moving']

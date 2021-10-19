@@ -6,6 +6,7 @@
     <h2 class="text-lg font-medium mr-4">
       Latest activities
     </h2>
+    {% if request.user.username == username %}
     <form>
       <input
         placeholder="Type to search..."
@@ -15,6 +16,7 @@
         value="{{ request.GET.q }}"
       />
     </form>
+    {% endif %}
   </section>
 
   <ul class="space-y-4">
