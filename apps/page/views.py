@@ -4,11 +4,15 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, View
+from django import template
+from django.utils.http import urlencode
 
 from apps.activity.models import Activity, Analytic
 
 GUEST_PAGE_SIZE = 3
 OWNER_PAGE_SIZE = 10
+register = template.Library()
+
 
 
 class IndexView(View):
