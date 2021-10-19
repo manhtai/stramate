@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='activity',
             name='start_location',
-            field=models.TextField(db_index=True),
+            field=models.TextField(blank=True, db_index=True),
         ),
     ]
