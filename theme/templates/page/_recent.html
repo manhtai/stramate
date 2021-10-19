@@ -2,10 +2,19 @@
 {% load heroicons %}
 
 <section class="mb-8 space-y-2">
-  <section class="flex items-center justify-between space-x-4">
-    <h2 class="text-lg font-medium">
+  <section class="flex items-center flex-wrap justify-between">
+    <h2 class="text-lg font-medium mr-4">
       Latest activities
     </h2>
+    <form>
+      <input
+        placeholder="Type to search..."
+        type="text"
+        name="q"
+        class="form-control form-block opacity-70"
+        value="{{ request.GET.q }}"
+      />
+    </form>
   </section>
 
   <ul class="space-y-4">
@@ -18,7 +27,7 @@
 
 <section class="pagination__wrapper">
   <p>
-    Total: {{ all_time_total }} activities
+    Total: {{ all_time_total|intcomma }} activities
   </p>
 
   <ul class="pagination__button">
