@@ -153,7 +153,8 @@ class TrendAnalyzer():
         # Calculate perf. using hrss for now
         self.df['ctl'] = self.df['hrss'].rolling(ctl_days, min_periods=1).mean()
         self.df['atl'] = self.df['hrss'].rolling(atl_days, min_periods=1).mean()
-        self.df['tsb'] = self.df['ctl'] - self.df['atl']
+        self.df['tsb'] = self.df['ctl'].shift(1) - self.df['atl'].shift(1)
+        self.df['tsb'].fillna(0, inplace=True)
 
         self.df.drop(columns='hrss', inplace=True)
 

@@ -22,8 +22,8 @@
   </section>
 
   <section class="flex items-center justify-end px-4 overflow-hidden bg-white border rounded">
-    <section style="width: 718px; height: 359px;">
-      <canvas style="width: 718px; height: 359px;" id="fitness"></canvas>
+    <section style="width: 718px; height: 400px;">
+      <canvas style="width: 718px; height: 400px;" id="fitness"></canvas>
     </section>
   </section>
 </section>
@@ -191,7 +191,10 @@
   const ftData = {{ fitness|safe }};
   const ctlData = ftData.map(d => d.ctl.toFixed(0));
   const atlData = ftData.map(d => d.atl.toFixed(0));
+  const tsbData = ftData.map(d => d.tsb.toFixed(0));
+
   const suggestedMax = Math.max(Math.max(...ctlData), Math.max(...atlData));
+  const suggestedMin = Math.min(...tsbData);
 
   const ftConfig = {
     type: 'line',
@@ -213,6 +216,15 @@
           yAxisID: 'atl',
           borderColor: bdColors[0],
           backgroundColor: bgColors[0],
+          borderWidth: 2,
+          pointRadius: 0,
+        },
+        {
+          label: "Form",
+          data: tsbData,
+          yAxisID: 'tsb',
+          borderColor: "rgba(248, 113, 113, 0.2)",
+          backgroundColor: "rgba(252, 165, 165, 0.2)",
           borderWidth: 2,
           pointRadius: 0,
         },
@@ -260,6 +272,7 @@
             drawBorder: false,
           },
           suggestedMax,
+          suggestedMin,
         },
         atl: {
           offset: true,
@@ -268,8 +281,21 @@
           grid: {
             drawBorder: false,
             tickLength: 0,
+            display: false,
           },
           suggestedMax,
+          suggestedMin,
+        },
+        tsb: {
+          offset: true,
+          display: false,
+          position: 'right',
+          grid: {
+            drawBorder: false,
+            tickLength: 0,
+          },
+          suggestedMax,
+          suggestedMin,
         },
       },
       layout: {
