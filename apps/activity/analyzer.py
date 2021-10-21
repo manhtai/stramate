@@ -105,12 +105,16 @@ class PointAnalyzer():
 
 
 class TrendAnalyzer():
+    # Ref: https://www.trainingpeaks.com/coach-blog/a-coachs-guide-to-atl-ctl-tsb/
+    atl_days = 7
+    ctl_days = 42
+    year_days = 366
 
     def __init__(self, athlete_id):
         self.athlete_id = athlete_id
 
     def analyze(self):
-        last_year = datetime.today() - timedelta(days=366)
+        last_year = datetime.today() - timedelta(days=self.year_days + self.ctl_days)
         user_activities = Activity.objects.filter(
             athlete_id=self.athlete_id,
             start_date_local__gte=last_year,
@@ -139,9 +143,6 @@ class TrendAnalyzer():
         return ts.to_pydatetime().replace(tzinfo=None).astimezone(self.timezone).strftime("%Y-%m-%d")
 
     def calculate_fitness_performance(self):
-        # Ref: https://www.trainingpeaks.com/coach-blog/a-coachs-guide-to-atl-ctl-tsb/
-        atl_days = 7
-        ctl_days = 42
 
         # Index by date to resample
         self.df['date'] = pd.to_datetime(self.df['start_date_local'], utc=True)
@@ -151,14 +152,16 @@ class TrendAnalyzer():
         self.df = self.df[['hrss']].resample('D').sum()
 
         # Calculate perf. using hrss for now
-        self.df['ctl'] = self.df['hrss'].rolling(ctl_days, min_periods=1).mean()
-        self.df['atl'] = self.df['hrss'].rolling(atl_days, min_periods=1).mean()
+        self.df['ctl'] = self.df['hrss'].rolling(self.ctl_days, min_periods=1).mean()
+        self.df['atl'] = self.df['hrss'].rolling(self.atl_days, min_periods=1).mean()
         self.df['tsb'] = self.df['ctl'].shift(1) - self.df['atl'].shift(1)
         self.df['tsb'].fillna(0, inplace=True)
 
         self.df.drop(columns='hrss', inplace=True)
 
+        last_year = pd.Timestamp.utcnow() - pd.Timedelta(days=self.year_days)
         return [
             {**v, "x": self.timestamp_date(k)}
             for k, v in self.df.to_dict(orient="index").items()
+            if k > last_year
         ]
