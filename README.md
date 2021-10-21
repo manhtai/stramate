@@ -16,6 +16,13 @@ More about performance chart: https://github.com/manhtai/stramate/wiki/Training-
 
 You should host it yourself, don't give your data to arbitrary people on the internet, especially me.
 
+
+## Demo
+
+![Heat](./theme/static/img/heatmap.png)
+
+![Training](./theme/static/img/fitness.png)
+
 ## Local setup
 
 1. Install NodeJS and Python Poetry first
