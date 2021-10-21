@@ -8,7 +8,7 @@ from django.views.generic import TemplateView, View
 
 from apps.activity.models import Activity, Analytic
 
-GUEST_PAGE_SIZE = 3
+GUEST_PAGE_SIZE = 5
 OWNER_PAGE_SIZE = 10
 
 
@@ -64,11 +64,6 @@ class RssView(Feed):
 
     def get_object(self, request, username):
         return get_object_or_404(User, username=username)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["activity"] = context["obj"]
-        return context
 
     def items(self, obj):
         return Activity.objects.filter(

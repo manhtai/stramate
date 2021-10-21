@@ -1,7 +1,9 @@
 {% load static %}
 
-{% include "activity/_activity_desc.html" %}
+{% with obj as activity %}
+  {% include "activity/_activity_desc.html" %}
 
-{% if activity.start_location %}
-  <img src="https://{{ request.get_host }}{% get_media_prefix %}{{ activity.map }}" />
-{% endif %}
+  {% if activity.start_location %}
+    <img src="https://{{ request.get_host }}{% get_media_prefix %}{{ activity.map }}" />
+  {% endif %}
+{% endwith %}

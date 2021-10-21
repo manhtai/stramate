@@ -8,6 +8,7 @@
 - [x] Fitness & fatigue performance chart
 - [x] Heart rate zones chart
 - [x] Interactive 3D route map
+- [x] Athlete RSS feed
 
 More about performance chart: https://github.com/manhtai/stramate/wiki/Training-load:-Fitness-&-Fatigue
 
