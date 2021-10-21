@@ -1,4 +1,3 @@
-{% load humanize %}
 {% load heroicons %}
 {% load static %}
 
@@ -11,6 +10,7 @@
       {% heroicon_outline "chart-pie" class="w-4 h-4" %}
     </a>
   </section>
+
   <h3 class="flex items-center text-xl font-bold justify-stretch space-x-3">
     <span class="flex-shrink-0">
     {% if activity.type == "Ride" %}
@@ -29,39 +29,7 @@
     </span>
     <p>{{ activity.name }}</p>
   </h3>
-  <section class="flex items-start justify-start">
-    <section class="pr-4 border-r">
-      {% if activity.distance %}
-        <h4 class="text-xs">Distance</h4>
-        <p class="text-base">{{ activity.total_distance }}</p>
-      {% else %}
-        <h4 class="text-xs">Calories</h4>
-        <p class="text-base">{{ activity.calories|intcomma }}</p>
-      {% endif %}
-    </section>
-    <section class="px-4 border-r">
-      {% if activity.type == "Ride" %}
-        <h4 class="text-xs">Elev. gain</h4>
-        <p class="text-base">{{ activity.total_elev }}</p>
-      {% elif activity.type == "Run" %}
-        <h4 class="text-xs">Pace</h4>
-        <p class="text-base">{{ activity.avg_pace }}</p>
-      {% elif activity.type == "Swim" %}
-        <h4 class="text-xs">Speed</h4>
-        <p class="text-base">{{ activity.avg_speed_mps }}</p>
-      {% elif activity.distance %}
-        <h4 class="text-xs">Speed</h4>
-        <p class="text-base">{{ activity.avg_speed_kph }}</p>
-      {% elif activity.max_hr %}
-        <h4 class="text-xs">Avg. HR</h4>
-        <p class="text-base">{{ activity.average_hr }}</p>
-      {% endif %}
-    </section>
-    <section class="px-4">
-      <h4 class="text-xs">Time</h4>
-      <p class="text-base">{{ activity.total_moving_time }}</p>
-    </section>
-  </section>
 
+  {% include "activity/_activity_desc.html" %}
   {% include "activity/_activity_map.html" %}
 <li>

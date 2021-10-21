@@ -1,0 +1,7 @@
+{% load static %}
+
+{% include "activity/_activity_desc.html" %}
+
+{% if activity.start_location %}
+  <img src="https://{{ request.get_host }}{% get_media_prefix %}{{ activity.map }}" />
+{% endif %}
