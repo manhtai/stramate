@@ -1,0 +1,35 @@
+{% load humanize %}
+
+<section class="flex items-start justify-start">
+  <section class="pr-4 border-r">
+    {% if activity.distance %}
+      <h4 class="text-xs">Distance</h4>
+      <p class="text-base">{{ activity.total_distance }}</p>
+    {% else %}
+      <h4 class="text-xs">Calories</h4>
+      <p class="text-base">{{ activity.calories|intcomma }}</p>
+    {% endif %}
+  </section>
+  <section class="px-4 border-r">
+    {% if activity.type == "Ride" %}
+      <h4 class="text-xs">Elev. gain</h4>
+      <p class="text-base">{{ activity.total_elev }}</p>
+    {% elif activity.type == "Run" %}
+      <h4 class="text-xs">Pace</h4>
+      <p class="text-base">{{ activity.avg_pace }}</p>
+    {% elif activity.type == "Swim" %}
+      <h4 class="text-xs">Speed</h4>
+      <p class="text-base">{{ activity.avg_speed_mps }}</p>
+    {% elif activity.distance %}
+      <h4 class="text-xs">Speed</h4>
+      <p class="text-base">{{ activity.avg_speed_kph }}</p>
+    {% elif activity.max_hr %}
+      <h4 class="text-xs">Avg. HR</h4>
+      <p class="text-base">{{ activity.average_hr }}</p>
+    {% endif %}
+  </section>
+  <section class="px-4">
+    <h4 class="text-xs">Time</h4>
+    <p class="text-base">{{ activity.total_moving_time }}</p>
+  </section>
+</section>

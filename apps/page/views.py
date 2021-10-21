@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -56,3 +57,32 @@ class ProfileView(TemplateView):
             context["page_obj"] = user_activities[:GUEST_PAGE_SIZE]
 
         return context
+
+
+class RssView(Feed):
+    description_template = 'activity/rss.html'
+
+    def get_object(self, request, username):
+        return get_object_or_404(User, username=username)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["activity"] = context["obj"]
+        return context
+
+    def items(self, obj):
+        return Activity.objects.filter(
+            user=obj
+        ).order_by('-start_date')[:GUEST_PAGE_SIZE]
+
+    def item_title(self, item):
+        return f"{item.type}: {item.name}"
+
+    def item_pubdate(self, item):
+        return item.start_date
+
+    def title(self, obj):
+        return f"Activities of {obj.username}"
+
+    def link(self, obj):
+        return reverse_lazy("page:profile", args=(obj.username,))
