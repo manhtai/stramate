@@ -8,12 +8,20 @@
 - [x] Fitness & fatigue performance chart
 - [x] Heart rate zones chart
 - [x] Interactive 3D route map
+- [x] Athlete RSS feed
 
 More about performance chart: https://github.com/manhtai/stramate/wiki/Training-load:-Fitness-&-Fatigue
 
 ## Notice
 
 You should host it yourself, don't give your data to arbitrary people on the internet, especially me.
+
+
+## Demo
+
+![Heat](./theme/static/img/heatmap.png)
+
+![Training](./theme/static/img/fitness.png)
 
 ## Local setup
 
