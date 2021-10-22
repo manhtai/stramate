@@ -133,6 +133,9 @@ def back_fill(athlete_id):
 @db_periodic_task(crontab(minute='*/5'))
 def check_for_new_activities():
     for ua in UserSocialAuth.objects.iterator():
+        if not ua.user.is_active:
+            continue
+
         imported = import_activities(ua.uid)
         if imported:
             update_trend_analytics(ua.uid)
@@ -141,6 +144,9 @@ def check_for_new_activities():
 @db_periodic_task(crontab(minute='1'))
 def build_cache_for_new_day():
     for ua in UserSocialAuth.objects.iterator():
+        if not ua.user.is_active:
+            continue
+
         last_analytic = Analytic.objects.filter(user=ua.user).order_by('date').last()
         today = datetime.utcnow()
 
