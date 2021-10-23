@@ -11,8 +11,6 @@ from apps.activity.models import Activity
 
 class PointAnalyzer():
 
-    HEART_RATE_ZONES = [.6, .7, .8, .9]
-
     def __init__(self, activity_id: int):
         self.activity = Activity.objects.get(id=activity_id)
         self.athlete = Athlete.objects.get(id=self.activity.athlete_id)
@@ -71,7 +69,9 @@ class PointAnalyzer():
     def calculate_heartrate_stress_score(self):
         lthr = ((self.max_hr - self.min_hr) * 0.85) + self.min_hr  # Karvonen formula
 
-        self.df['hrr'] = self.df['heartrate'].apply(lambda x: (x - self.min_hr) / (self.max_hr - self.min_hr))
+        self.df['hrr'] = self.df['heartrate'].apply(
+            lambda x: (x - self.min_hr) / (self.max_hr - self.min_hr)
+        )
 
         self.trimp = ((1 / 60) * self.df['hrr'] * (
             0.64 * np.exp(self.trimp_factor * self.df['hrr']))).sum()
@@ -80,28 +80,9 @@ class PointAnalyzer():
         self.hrss = (self.trimp / (60 * hrr_lthr * (0.64 * np.exp(self.trimp_factor * hrr_lthr)))) * 100
 
     def calculate_heartrate_zones(self):
-        hrr = self.max_hr - self.min_hr
-
-        z1 = round((hrr * self.HEART_RATE_ZONES[0]) + self.min_hr)
-        z2 = round((hrr * self.HEART_RATE_ZONES[1]) + self.min_hr)
-        z3 = round((hrr * self.HEART_RATE_ZONES[2]) + self.min_hr)
-        z4 = round((hrr * self.HEART_RATE_ZONES[3]) + self.min_hr)
-
-        self.df["hr_zones"] = self.df['heartrate'].apply(lambda x: self.map_zone(x, z1, z2, z3, z4))
-
-    @staticmethod
-    def map_zone(heartrate, z1, z2, z3, z4):
-        if not heartrate:
-            return 0
-        if heartrate <= z1:
-            return 1
-        if heartrate <= z2:
-            return 2
-        if heartrate <= z3:
-            return 3
-        if heartrate <= z4:
-            return 4
-        return 5
+        self.df["hr_zones"] = self.df['heartrate'].apply(
+            lambda x: Activity.map_zone(x, self.max_hr, self.min_hr)
+        )
 
 
 class TrendAnalyzer():
