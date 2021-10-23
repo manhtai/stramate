@@ -337,7 +337,7 @@ class Activity(models.Model):
             zones[z] += 1
 
         zones_range = [
-            f"< {l} bpm" if not h else f"{l} bpm - {h} bpm" if l else f"> {h} bpm"
+            f"< {l} bpm" if not h else f"{h} bpm - {l} bpm" if l else f"> {h} bpm"
             for [l, h] in zip_longest(self.hr_zones_range, [None] + self.hr_zones_range)
         ]
 
