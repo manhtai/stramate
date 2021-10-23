@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import zip_longest
 from datetime import datetime, timedelta
 from os import path
 from urllib.parse import quote_plus
@@ -27,6 +28,9 @@ FIELD_DEFAULTS = {
     "average_speed": 0,
     "timezone": "UTC",
 }
+
+
+HEART_RATE_ZONES = [.6, .7, .8, .9]
 
 
 class Analytic(models.Model):
@@ -151,6 +155,54 @@ class Activity(models.Model):
             return f"{hr:.0f} bpm"
         return ''
 
+    @staticmethod
+    def map_zone(heartrate, max_hr, min_hr):
+        [z1, z2, z3, z4] = Activity.get_zones(max_hr, min_hr)
+
+        if not heartrate:
+            return 0
+        if heartrate <= z1:
+            return 1
+        if heartrate <= z2:
+            return 2
+        if heartrate <= z3:
+            return 3
+        if heartrate <= z4:
+            return 4
+
+        return 5
+
+    @staticmethod
+    def get_zones(max_hr, min_hr):
+        hrr = max_hr - min_hr
+
+        z1 = round((hrr * HEART_RATE_ZONES[0]) + min_hr)
+        z2 = round((hrr * HEART_RATE_ZONES[1]) + min_hr)
+        z3 = round((hrr * HEART_RATE_ZONES[2]) + min_hr)
+        z4 = round((hrr * HEART_RATE_ZONES[3]) + min_hr)
+
+        return [z1, z2, z3, z4]
+
+    @cached_property
+    def hr_zones_range(self):
+        max_hr = self.analytics.get('max_hr')
+        min_hr = self.analytics.get('min_hr')
+
+        if not max_hr or not min_hr:
+            return []
+
+        return self.get_zones(max_hr, min_hr)
+
+    @cached_property
+    def hr_zones_colors(self):
+        return [
+            'rgba(156, 163, 175, 1)',
+            'rgba(52, 211, 153, 1)',
+            'rgba(96, 165, 250, 1)',
+            'rgba(251, 191, 36, 1)',
+            'rgba(248, 113, 113, 1)',
+        ]
+
     @classmethod
     def get_last_year_stats(cls, user_id):
         all_time_total = Activity.objects.filter(user_id=user_id).count()
@@ -273,15 +325,24 @@ class Activity(models.Model):
     def total_moving_time(self):
         return self.format_time(self.moving_time)
 
-    @property
+    @cached_property
     def heart_rate_zones(self):
         hr_zones = self.analytics.get("hr_zones")
         if not hr_zones:
             return []
 
         zones = defaultdict(int)
+        total_time = len(hr_zones)
         for z in hr_zones:
             zones[z] += 1
+
+        zones_range = [
+            f"< {l} bpm" if not h else f"{l} bpm - {h} bpm" if l else f"> {h} bpm"
+            for [l, h] in zip_longest(self.hr_zones_range, [None] + self.hr_zones_range)
+        ]
+
+        zones_colors = self.hr_zones_colors
+        zones_bg = [c.replace(', 1)', ', 0.4)') for c in zones_colors]
 
         return [
             {
@@ -289,6 +350,10 @@ class Activity(models.Model):
                 "zonef": f"Zone {i}",
                 "time": zones[i],
                 "timef": self.format_time(zones[i]),
+                "percent": f"{zones[i] / total_time * 100:.0f}%",
+                "color": zones_colors[i - 1],
+                "bg": zones_bg[i - 1],
+                "range": zones_range[i - 1],
             }
             for i in [1, 2, 3, 4, 5]
         ]
