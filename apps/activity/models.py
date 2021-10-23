@@ -203,30 +203,6 @@ class Activity(models.Model):
             'rgba(248, 113, 113, 1)',
         ]
 
-    @property
-    def hr_zones(self):
-        zones_range = [
-            f"< {l} bpm" if not h else f"{l} bpm - {h} bpm" if l else f"> {h} bpm"
-            for [l, h] in zip_longest(self.hr_zones_range, [None] + self.hr_zones_range)
-        ]
-
-        zones_colors = self.hr_zones_colors
-        zones_bg = [c.replace(', 1)', ', 0.4)') for c in zones_colors]
-
-        total_time = sum(t["time"] for t in self.heart_rate_zones)
-        zones_times = [
-            f"{t['time'] / total_time * 100:.0f}%"
-            for t in self.heart_rate_zones
-        ]
-
-        return zip_longest(
-            [5, 4, 3, 2, 1],
-            zones_range[::-1],
-            zones_colors[::-1],
-            zones_bg[::-1],
-            zones_times[::-1],
-        )
-
     @classmethod
     def get_last_year_stats(cls, user_id):
         all_time_total = Activity.objects.filter(user_id=user_id).count()
@@ -356,8 +332,17 @@ class Activity(models.Model):
             return []
 
         zones = defaultdict(int)
+        total_time = len(hr_zones)
         for z in hr_zones:
             zones[z] += 1
+
+        zones_range = [
+            f"< {l} bpm" if not h else f"{l} bpm - {h} bpm" if l else f"> {h} bpm"
+            for [l, h] in zip_longest(self.hr_zones_range, [None] + self.hr_zones_range)
+        ]
+
+        zones_colors = self.hr_zones_colors
+        zones_bg = [c.replace(', 1)', ', 0.4)') for c in zones_colors]
 
         return [
             {
@@ -365,6 +350,10 @@ class Activity(models.Model):
                 "zonef": f"Zone {i}",
                 "time": zones[i],
                 "timef": self.format_time(zones[i]),
+                "percent": f"{zones[i] / total_time * 100:.0f}%",
+                "color": zones_colors[i - 1],
+                "bg": zones_bg[i - 1],
+                "range": zones_range[i - 1],
             }
             for i in [1, 2, 3, 4, 5]
         ]
