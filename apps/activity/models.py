@@ -1,19 +1,15 @@
 from collections import defaultdict
 from itertools import zip_longest
-from datetime import datetime, timedelta
 from os import path
 from urllib.parse import quote_plus
 
 import polyline
-import pytz
 import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
-from django.db.models import Count, Sum
-from django.db.models.functions import TruncDate
 from django.urls import reverse_lazy
 from django.utils.functional import cached_property
 
@@ -202,57 +198,6 @@ class Activity(models.Model):
             'rgba(251, 191, 36, 1)',
             'rgba(248, 113, 113, 1)',
         ]
-
-    @classmethod
-    def get_last_year_stats(cls, user_id):
-        all_time_total = Activity.objects.filter(user_id=user_id).count()
-
-        last_year = datetime.today() - timedelta(days=366)
-        user_activities = Activity.objects.filter(
-            user_id=user_id,
-            start_date_local__gte=last_year,
-        ).order_by('start_date')
-
-        last = user_activities.last()
-        timezone = last.timezone if last else "UTC"
-
-        today = datetime.now().astimezone(pytz.timezone(timezone))
-
-        last_year_activities = user_activities \
-            .values('start_date_local') \
-            .annotate(date=TruncDate('start_date_local')) \
-            .values('date') \
-            .annotate(
-                moving=Sum('moving_time'),
-                count=Count('id'),
-            ) \
-            .values('date', 'moving', 'count') \
-            .order_by('date')
-
-        last_year_dict = {
-            d['date']: d['moving']
-            for d in last_year_activities
-        }
-
-        last_year_total = sum(d['count'] for d in last_year_activities)
-
-        last_year_moving = [
-            {
-                "x": d.strftime("%Y-%m-%d"),
-                "y": (d + timedelta(days=1)).weekday(),
-                "d": d.strftime("%b %-d, %Y"),
-                "v": last_year_dict.get(d.date(), 0),
-                "l": cls.format_time(last_year_dict.get(d.date(), 0)),
-            }
-            for i in range(0, 366)
-            for d in [today - timedelta(days=i)]
-        ]
-
-        return {
-            "all_time_total": all_time_total,
-            "last_year_total": last_year_total,
-            "last_year_moving": last_year_moving,
-        }
 
     @cached_property
     def polyline(self):

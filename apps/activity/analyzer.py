@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import pytz
 from dateutil.relativedelta import relativedelta
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncDate
 
 from apps.account.models import Athlete
 from apps.activity.models import Activity
@@ -89,7 +91,7 @@ class TrendAnalyzer():
     # Ref: https://www.trainingpeaks.com/coach-blog/a-coachs-guide-to-atl-ctl-tsb/
     atl_days = 7
     ctl_days = 42
-    year_days = 366
+    year_days = 365
 
     def __init__(self, athlete_id):
         self.athlete_id = athlete_id
@@ -106,7 +108,7 @@ class TrendAnalyzer():
         self.user = last.user
 
         today = datetime.now().astimezone(self.timezone)
-        last_year = today - timedelta(days=366)
+        last_year = today - timedelta(days=self.year_days + 1)
 
         user_analytics = user_activities.values("analytics", "start_date_local")
 
@@ -114,7 +116,10 @@ class TrendAnalyzer():
             self.df = pd.DataFrame(user_analytics)
 
             today_local = today.replace(tzinfo=None).astimezone()
-            self.df = self.df.append({"start_date_local": today_local, "analytics": {}}, ignore_index=True)
+            self.df = self.df.append(
+                {"start_date_local": today_local, "analytics": {}},
+                ignore_index=True,
+            )
 
             return self.calculate_fitness_performance()
 
@@ -123,13 +128,65 @@ class TrendAnalyzer():
     def timestamp_date(self, ts: pd.Timestamp):
         return ts.to_pydatetime().replace(tzinfo=None).astimezone(self.timezone).strftime("%Y-%m-%d")
 
-    def calculate_fitness_performance(self):
+    @classmethod
+    def get_last_year_stats(cls, user_id):
+        all_time_total = Activity.objects.filter(user_id=user_id).count()
 
+        last_year = datetime.today() - timedelta(days=cls.year_days + 1)
+        user_activities = Activity.objects.filter(
+            user_id=user_id,
+            start_date_local__gte=last_year,
+        ).order_by('start_date')
+
+        last = user_activities.last()
+        timezone = last.timezone if last else "UTC"
+
+        today = datetime.now().astimezone(pytz.timezone(timezone))
+
+        last_year_activities = user_activities \
+            .values('start_date_local') \
+            .annotate(date=TruncDate('start_date_local')) \
+            .values('date') \
+            .annotate(
+                moving=Sum('moving_time'),
+                count=Count('id'),
+            ) \
+            .values('date', 'moving', 'count') \
+            .order_by('date')
+
+        last_year_dict = {
+            d['date']: d['moving']
+            for d in last_year_activities
+        }
+
+        last_year_total = sum(d['count'] for d in last_year_activities)
+
+        last_year_moving = [
+            {
+                "x": d.strftime("%Y-%m-%d"),
+                "y": (d + timedelta(days=1)).weekday(),
+                "d": d.strftime("%b %-d, %Y"),
+                "v": last_year_dict.get(d.date(), 0),
+                "l": Activity.format_time(last_year_dict.get(d.date(), 0)),
+            }
+            for i in range(cls.year_days)
+            for d in [today - timedelta(days=i)]
+        ]
+
+        return {
+            "all_time_total": all_time_total,
+            "last_year_total": last_year_total,
+            "last_year_moving": last_year_moving,
+        }
+
+    def calculate_fitness_performance(self):
         # Index by date to resample
         self.df['date'] = pd.to_datetime(self.df['start_date_local'], utc=True)
         self.df.set_index('date', inplace=True)
 
-        self.df['hrss'] = self.df["analytics"].map(lambda a: a.get('hrss', 0) if type(a) is dict else 0).fillna(0)
+        self.df['hrss'] = self.df["analytics"].map(
+            lambda a: a.get('hrss', 0) if type(a) is dict else 0
+        ).fillna(0)
         self.df = self.df[['hrss']].resample('D').sum()
 
         # Calculate perf. using hrss for now
