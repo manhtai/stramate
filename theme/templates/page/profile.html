@@ -8,14 +8,18 @@
 {% block main %}
   <section class="flex items-center justify-between my-10">
     <section class="flex items-center justtify-center space-x-2">
-      <h1 class="text-4xl font-bold">
+      <a class="text-4xl font-bold" href="{% url "page:profile" username %}">
         {{ username }}
-      </h1>
+      </a>
     </section>
     <a href="{% url "page:rss" username %}" class="opacity-50" />
       {% heroicon_outline "rss" class="w-6 h-6" %}
     </a>
   </section>
 
-  {% include "page/_stats.html" %}
+  {% if not request.GET.page and not request.GET.q %}
+    {% include "page/_heatmap.html" %}
+  {% endif %}
+
+  {% include "page/_recent.html" %}
 {% endblock %}

@@ -4,11 +4,6 @@
 <li class="relative px-4 py-6 bg-white border rounded bg-gray-50 space-y-4">
   <section class="flex items-start justify-between space-x-2">
     {% include "activity/_activity_date.html" %}
-    <a href="{% url "activity:detail" activity.id %}"
-       class="opacity-50 text-link"
-       title="View this activity">
-      {% heroicon_outline "chart-pie" class="w-4 h-4" %}
-    </a>
   </section>
 
   <h3 class="flex items-center text-xl font-bold justify-stretch space-x-3">
@@ -27,7 +22,9 @@
       {% include "activity/activity.svg" %}
     {% endif %}
     </span>
-    <p>{{ activity.name }}</p>
+    <a href="{% url "activity:detail" activity.id %}" class="text-link">
+      <p>{{ activity.name }}</p>
+    </a>
   </h3>
 
   {% include "activity/_activity_desc.html" %}
