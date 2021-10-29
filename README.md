@@ -14,7 +14,7 @@ More about performance chart: https://github.com/manhtai/stramate/wiki/Training-
 
 ## Notice
 
-You should host it yourself, don't give your data to arbitrary people on the internet, especially me.
+You should host it yourself, don't give your data to arbitrary people on the internet.
 
 
 ## Demo
