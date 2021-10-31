@@ -190,8 +190,8 @@ class TrendAnalyzer():
         self.df = self.df[['hrss']].resample('D').sum()
 
         # Calculate perf. using hrss for now
-        self.df['ctl'] = self.df['hrss'].rolling(self.ctl_days, min_periods=1).mean()
-        self.df['atl'] = self.df['hrss'].rolling(self.atl_days, min_periods=1).mean()
+        self.df['ctl'] = self.df['hrss'].ewm(span=self.ctl_days).mean()
+        self.df['atl'] = self.df['hrss'].ewm(span=self.atl_days).mean()
         self.df['tsb'] = self.df['ctl'] - self.df['atl']
 
         self.df.drop(columns='hrss', inplace=True)
