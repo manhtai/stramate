@@ -75,11 +75,14 @@ class PointAnalyzer():
             lambda x: (x - self.min_hr) / (self.max_hr - self.min_hr)
         )
 
-        self.trimp = ((1 / 60) * self.df['hrr'] * (
-            0.64 * np.exp(self.trimp_factor * self.df['hrr']))).sum()
+        trimp = (
+            (1 / 60) * self.df['hrr'] * (0.64 * np.exp(self.trimp_factor * self.df['hrr']))
+        ).sum()
 
         hrr_lthr = (lthr - self.min_hr) / (self.max_hr - self.min_hr)
-        self.hrss = (self.trimp / (60 * hrr_lthr * (0.64 * np.exp(self.trimp_factor * hrr_lthr)))) * 100
+        self.hrss = (
+            trimp / (60 * hrr_lthr * (0.64 * np.exp(self.trimp_factor * hrr_lthr)))
+        ) * 100
 
     def calculate_heartrate_zones(self):
         self.df["hr_zones"] = self.df['heartrate'].apply(
