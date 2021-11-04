@@ -6,15 +6,24 @@
 {% block title %}{{ username }}{% endblock %}
 
 {% block main %}
-  <section class="flex items-center justify-between my-10">
-    <section class="flex items-center justtify-center space-x-2">
-      <a class="text-4xl font-bold" href="{% url "page:profile" username %}">
-        {{ username }}
-      </a>
-    </section>
-    <a href="{% url "page:rss" username %}" class="opacity-50" />
-      {% heroicon_outline "rss" class="w-6 h-6" %}
+  <section class="flex flex-wrap items-center justify-between my-10 space-y-4">
+    <a class="text-4xl font-bold" href="{% url "page:profile" username %}">
+      {{ username }}
     </a>
+    <p class="flex items-center justify-center space-x-3">
+      <span class="flex items-center justify-center space-x-1">
+        {% include "activity/run.svg" %}
+        <span>{{ all_time_distance.Run|intcomma }} km</span>
+      </span>
+      <span class="flex items-center justify-center space-x-1">
+        {% include "activity/ride.svg" %}
+        <span>{{ all_time_distance.Ride|intcomma }} km</span>
+      </span>
+      <span class="flex items-center justify-center space-x-1">
+        {% include "activity/swim.svg" %}
+        <span>{{ all_time_distance.Swim|intcomma }} km</span>
+      </span>
+    </p>
   </section>
 
   {% if not request.GET.page and not request.GET.q %}

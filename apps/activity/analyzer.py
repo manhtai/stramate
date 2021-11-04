@@ -134,6 +134,19 @@ class TrendAnalyzer():
     @classmethod
     def get_last_year_stats(cls, user_id):
         all_time_total = Activity.objects.filter(user_id=user_id).count()
+        distances = Activity.objects \
+            .filter(user_id=user_id, type__in=["Ride", "Run", "Swim"]) \
+            .values("type") \
+            .annotate(
+                distance=Sum('distance')
+            ) \
+            .values("type", "distance") \
+            .order_by("type")
+
+        all_time_distance = {
+            d['type']: f"{d['distance'] / 1000:.1f}"
+            for d in distances
+        }
 
         last_year = datetime.today() - timedelta(days=cls.year_days + 1)
         user_activities = Activity.objects.filter(
@@ -178,6 +191,7 @@ class TrendAnalyzer():
 
         return {
             "all_time_total": all_time_total,
+            "all_time_distance": all_time_distance,
             "last_year_total": last_year_total,
             "last_year_moving": last_year_moving,
         }
