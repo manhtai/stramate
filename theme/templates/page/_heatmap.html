@@ -4,6 +4,9 @@
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
     <h2 class="text-lg font-medium">{{ last_year_total|intcomma }} activities in the last year</h2>
+    <a href="{% url "page:rss" username %}" class="opacity-50" />
+      {% heroicon_outline "rss" class="w-4 h-4" %}
+    </a>
   </section>
 
   <section class="flex items-center justify-end px-4 overflow-hidden bg-white border rounded">
