@@ -10,7 +10,7 @@ def initialize_activities_import(uid, is_new, user, *args, **kwargs):
     Athlete.get_athlete(user, uid=uid)
 
     if is_new:
-        if settings.DISABLE_REGISTRATION:
+        if settings.DISABLE_REGISTRATION and Athlete.objects.count() > 1:
             user.is_active = False
             user.save()
         else:

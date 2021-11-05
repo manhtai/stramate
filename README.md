@@ -30,9 +30,18 @@ You should host it yourself, don't give your data to arbitrary people on the int
 2. Create `.env` file in the project root
 
 ```
+# Strava sync
 STRAVA_CLIENT_ID=xxxxx
 STRAVA_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Activity map
 MAPBOX_ACCESS_TOKEN=pk.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Production mode
+ENV=production
+
+# Disable new registration
+DISABLE_REGISTRATION=true
 ```
 
 - Strava keys: https://www.strava.com/settings/api
