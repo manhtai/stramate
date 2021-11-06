@@ -94,7 +94,7 @@ class TrendAnalyzer():
     # Ref: https://www.trainingpeaks.com/coach-blog/a-coachs-guide-to-atl-ctl-tsb/
     atl_days = 7
     ctl_days = 42
-    year_days = 365
+    year_days = 364
 
     def __init__(self, athlete_id):
         self.athlete_id = athlete_id
