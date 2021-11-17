@@ -16,7 +16,7 @@
   </section>
 </section>
 
-{% if request.user == activity.user %}
+{% if request.user.username == username %}
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
     <h2 class="text-lg font-medium">Training load over the year</h2>
