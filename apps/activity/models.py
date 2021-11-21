@@ -329,7 +329,7 @@ class Activity(models.Model):
     def _download_map(self, file_path):
         at = settings.MAPBOX_ACCESS_TOKEN
         pl = quote_plus(self.detail["map"]["polyline"])
-        url = f"https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-3+ff0000-1({pl})/auto/1000x400@2x?padding=50&access_token={at}"
+        url = f"https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-3+30a14e-1({pl})/auto/1000x400@2x?padding=50&access_token={at}"
 
         with requests.get(url, stream=True) as r:
             r.raise_for_status()
