@@ -33,6 +33,7 @@ class ProfileView(TemplateView):
         if analytic:
             stats = analytic.heatmap
             stats["fitness"] = analytic.fitness
+            stats["today"] = analytic.fitness[-1]
 
         user_activities = Activity.objects.filter(
             user_id=user.id
