@@ -4,8 +4,9 @@
 
 <section class="mb-8 space-y-2">
   <section class="flex items-center flex-wrap justify-between">
-    <h2 class="text-lg font-medium mr-4">
-      Latest activities
+    <h2 class="flex items-center justify-start space-x-1 text-lg mr-4">
+      {% heroicon_outline "calendar" class="w-4 h-4 opacity-70" %}
+      <span>Latest activities</span>
     </h2>
     {% if request.user.username == username %}
     <form>

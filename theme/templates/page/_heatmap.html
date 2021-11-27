@@ -3,7 +3,10 @@
 
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
-    <h2 class="text-lg">{{ last_year_total|intcomma }} activities in the last year</h2>
+    <h2 class="text-lg flex items-center justify-start space-x-1">
+      {% heroicon_outline "chart-bar" class="w-4 h-4 opacity-70" %}
+      <span>{{ last_year_total|intcomma }} activities in the last year</span>
+    </h2>
     <a href="{% url "page:rss" username %}" class="opacity-50" />
       {% heroicon_outline "rss" class="w-4 h-4" %}
     </a>
@@ -16,12 +19,20 @@
   </section>
 </section>
 
-{% if request.user.username == username %}
+{% if request.user.username == username or show_fitness_chart %}
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
-    <h2 class="text-lg">
-      <span class="text-green-700">Fitness {{ today.ctl|floatformat:"0" }}</span> &middot;
-      <span class="text-gray-700">Fatigue {{ today.atl|floatformat:"0" }}</span> &middot;
+    <h2 class="text-lg flex items-center justify-start space-x-1">
+      {% if show_fitness_chart %}
+        {% heroicon_outline "globe" class="w-4 h-4 opacity-70" %}
+      {% else %}
+        {% heroicon_outline "lock-closed" class="w-4 h-4 opacity-70" %}
+      {% endif %}
+
+      <span class="text-green-700">Fitness {{ today.ctl|floatformat:"0" }}</span>
+      <span>&middot;</span>
+      <span class="text-gray-700">Fatigue {{ today.atl|floatformat:"0" }}</span>
+      <span>&middot;</span>
       <span class="text-blue-700">Form {{ today.tsb|floatformat:"0" }}</span>
     </h2>
     <a href="https://github.com/manhtai/stramate/wiki/Training-load:-Fitness-&-Fatigue" class="opacity-50 text-link" title="Fitness and fatigue" target="new">

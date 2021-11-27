@@ -33,6 +33,11 @@
             {{ form.resting_hr }}
             {{ form.resting_hr.errors }}
         </div>
+        <div class="flex items-center justify-start space-x-2">
+            {{ form.hide_fitness }}
+            {{ form.hide_fitness.errors }}
+            <label for="{{ form.hide_fitness.id_for_label }}">Hide the fitness score chart</label>
+        </div>
 
         <div class="space-x-2">
           <input type="submit" value="Update" class="btn btn-primary">

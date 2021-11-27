@@ -14,6 +14,8 @@ class Athlete(models.Model):
     birthday = models.DateField()
     resting_hr = models.IntegerField(default=60)  # This may vary overtime, but may not effect that much
 
+    hide_fitness = models.BooleanField(default=False)
+
     @classmethod
     def get_athlete(cls, user, uid=None):
         if not uid:

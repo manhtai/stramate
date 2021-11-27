@@ -3,9 +3,7 @@
 {% load heroicons %}
 
 <li class="relative px-4 py-6 bg-white border rounded bg-gray-50 space-y-4">
-  {% if activity.start_location %}
-      {% include "activity/_activity_map.html" %}
-  {% endif %}
+  {% include "activity/_activity_map.html" %}
 
   <section class="flex items-start justify-between space-x-2">
     {% include "activity/_activity_date.html" %}

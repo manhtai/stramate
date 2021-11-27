@@ -28,7 +28,11 @@ class ProfileView(TemplateView):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
 
+        athlete = user.athlete_set.first()
+        context["show_fitness_chart"] = athlete and not athlete.hide_fitness
+
         stats = {}
+
         analytic = Analytic.objects.filter(user_id=user.id).order_by('date').last()
         if analytic:
             stats = analytic.heatmap

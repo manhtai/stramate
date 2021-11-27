@@ -25,6 +25,11 @@
             {{ form.description.errors }}
         </div>
         {% if activity.start_location %}
+        <div class="flex items-center justify-start space-x-2">
+            {{ form.hide_map }}
+            {{ form.hide_map.errors }}
+            <label for="{{ form.hide_map.id_for_label }}">Hide the map</label>
+        </div>
         <div>
             <label for="{{ form.initial_rotation.id_for_label }}">Initial 3D map rotation: (degree)</label>
             {{ form.initial_rotation }}

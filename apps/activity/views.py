@@ -16,9 +16,12 @@ class RouteView(TemplateView):
 
         activity_id = kwargs.get('activity_id')
         activity = get_object_or_404(Activity, id=activity_id)
-        context["activity"] = activity
 
-        return context
+        if self.request.user == activity.user or not activity.hide_map:
+            context["activity"] = activity
+            return context
+
+        raise Http404()
 
 
 class DetailView(DetailView):

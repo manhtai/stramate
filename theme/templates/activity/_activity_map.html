@@ -1,6 +1,6 @@
 {% load static %}
 
-{% if activity.start_location %}
+{% if activity.start_location and request.user == activity.user or not activity.hide_map %}
   <a href="{% url "activity:route" activity.id %}"
      class="text-link overflow-hidden rounded"
      title="View 3D map">

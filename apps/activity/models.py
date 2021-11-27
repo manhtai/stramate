@@ -75,6 +75,9 @@ class Activity(models.Model):
     athlete_id = models.PositiveIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    # Hide
+    hide_map = models.BooleanField(default=False)
+
     @classmethod
     def upsert(cls, user_id, detail, streams):
         detail_dict = detail.to_dict()
