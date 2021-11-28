@@ -3,7 +3,7 @@
 
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
-    <h2 class="text-lg flex items-center justify-start space-x-1">
+    <h2 class="flex items-center justify-start text-lg space-x-1">
       {% heroicon_outline "chart-bar" class="w-4 h-4 opacity-70" %}
       <span>{{ last_year_total|intcomma }} activities in the last year</span>
     </h2>
@@ -22,12 +22,8 @@
 {% if request.user.username == username or show_fitness_chart %}
 <section class="mb-8 space-y-2">
   <section class="flex items-center justify-between space-x-4">
-    <h2 class="text-lg flex items-center justify-start space-x-1">
-      {% if show_fitness_chart %}
-        {% heroicon_outline "globe" class="w-4 h-4 opacity-70" %}
-      {% else %}
-        {% heroicon_outline "lock-closed" class="w-4 h-4 opacity-70" %}
-      {% endif %}
+    <h2 class="flex items-center justify-start text-lg space-x-1">
+      {% heroicon_outline "lightning-bolt" class="w-4 h-4 opacity-70" %}
 
       <span class="text-green-700">Fitness {{ today.ctl|floatformat:"0" }}</span>
       <span>&middot;</span>

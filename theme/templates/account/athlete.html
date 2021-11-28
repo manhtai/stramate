@@ -16,7 +16,7 @@
         These metrics are used to calculate your performance
       </h2>
     </section>
-    <form method="post" class="px-4 py-6 mt-8 border rounded space-y-6 bg-white">
+    <form method="post" class="px-4 py-6 mt-8 bg-white border rounded space-y-6">
         {{ form.non_field_errors }}
         <div>
             <label for="{{ form.sex.id_for_label }}">Sex:</label>
@@ -36,7 +36,7 @@
         <div class="flex items-center justify-start space-x-2">
             {{ form.hide_fitness }}
             {{ form.hide_fitness.errors }}
-            <label for="{{ form.hide_fitness.id_for_label }}">Hide the fitness score chart</label>
+            <label for="{{ form.hide_fitness.id_for_label }}">Hide the performance chart</label>
         </div>
 
         <div class="space-x-2">
