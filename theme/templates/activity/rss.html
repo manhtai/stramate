@@ -3,7 +3,7 @@
 {% with obj as activity %}
   {% include "activity/_activity_desc.html" %}
 
-  {% if activity.start_location %}
+  {% if activity.start_location and not activity.hide_map %}
     <img src="https://{{ request.get_host }}{% get_media_prefix %}{{ activity.map }}" />
   {% endif %}
 {% endwith %}
