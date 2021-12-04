@@ -144,7 +144,7 @@ class TrendAnalyzer():
             .order_by("type")
 
         all_time_distance = {
-            d['type']: f"{d['distance'] / 1000:.1f}"
+            d['type']: f"{d['distance'] / 1000:.0f}"
             for d in distances
         }
 

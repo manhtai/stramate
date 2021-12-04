@@ -6,11 +6,11 @@
 {% block title %}{{ username }}{% endblock %}
 
 {% block main %}
-  <section class="flex flex-wrap items-center justify-between my-10 space-y-4">
+  <section class="flex flex-wrap items-center justify-between my-10 leading-10">
     <a class="text-4xl font-bold" href="{% url "page:profile" username %}">
       {{ username }}
     </a>
-    <p class="flex items-center justify-center space-x-3">
+    <p class="flex items-center justify-center space-x-3 opacity-80">
       <span class="flex items-center justify-center space-x-1">
         {% include "activity/run.svg" %}
         <span>{{ all_time_distance.Run|intcomma }} km</span>
