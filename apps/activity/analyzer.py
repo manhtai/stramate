@@ -51,7 +51,7 @@ class PointAnalyzer():
 
     def init_df(self):
         # Which streams will be analyzed
-        types = ['time', 'heartrate']
+        types = ['time', 'heartrate', 'moving']
 
         self.df = pd.DataFrame(columns=types)
         for type in types:
@@ -71,13 +71,14 @@ class PointAnalyzer():
     def calculate_heartrate_stress_score(self):
         lthr = ((self.max_hr - self.min_hr) * 0.85) + self.min_hr  # Karvonen formula
 
-        self.df['hrr'] = self.df['heartrate'].apply(
-            lambda x: (x - self.min_hr) / (self.max_hr - self.min_hr)
+        hrr = self.df.apply(
+            lambda row:
+            0 if row['moving'] < 1
+            else (row['heartrate'] - self.min_hr) / (self.max_hr - self.min_hr),
+            axis=1,
         )
 
-        trimp = (
-            (1 / 60) * self.df['hrr'] * (0.64 * np.exp(self.trimp_factor * self.df['hrr']))
-        ).sum()
+        trimp = ((1 / 60) * hrr * (0.64 * np.exp(self.trimp_factor * hrr))).sum()
 
         hrr_lthr = (lthr - self.min_hr) / (self.max_hr - self.min_hr)
         self.hrss = (
